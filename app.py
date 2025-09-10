@@ -30,13 +30,13 @@ def author():
 
 @app.route("/image")
 def image():
-    path = url_for("static", filename="Old school love.jpg")
-    return '''
+    path = url_for("static", filename="image.jpg")
+    return'''
 <!doctype html>
 <html>
     <body>
         <h1>Том Харди</h1>
-        <img scr="''' + path + '''">
+        <img src="''' + path + '''">
     </body>
 </html>
 '''
