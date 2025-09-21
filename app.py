@@ -48,6 +48,8 @@ def image():
     </head>
     <body>
         <h1>Том Харди</h1>
+        <h3>I wanna da-, I wanna dance in the lights<br>
+        I wanna ro-, I wanna rock your body</h3>
         <img src="''' + path + '''">
     </body>
 </html>
