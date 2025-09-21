@@ -7,7 +7,7 @@ def not_found(err):
     return "Такой страницы не существует :(", 404
 
 @app.route("/")
-@app.route("/web")
+@app.route("/lab1/web")
 def web():
     return """<!doctype html>
         <html>
@@ -20,7 +20,7 @@ def web():
             'Content-Type': 'text/plain; charset=utf-8'
         }
 
-@app.route("/author")
+@app.route("/lab1/author")
 def author():
     name = "Махмадбекова Анастасия Эргашевна"
     group = "ФБИ-32"
@@ -36,7 +36,7 @@ def author():
             </body>
         </html>"""
 
-@app.route("/image")
+@app.route("/lab1/image")
 def image():
     path = url_for("static", filename="image.jpg")
     css_path = url_for("static", filename="lab1.css")
@@ -56,7 +56,7 @@ def image():
 '''
 
 count = 0
-@app.route('/counter')
+@app.route('/lab1/counter')
 def counter():
     global count
     count += 1
@@ -77,7 +77,7 @@ def counter():
 </html>
 '''
 
-@app.route("/counter/clear")
+@app.route("/lab1/counter/clear")
 def counter_clear():
     global count
     count = 0
@@ -91,9 +91,9 @@ def counter_clear():
 </html>
 '''
 
-@app.route("/info")
+@app.route("/lab1/info")
 def info():
-    return redirect("/author")
+    return redirect("/lab1/author")
 
 @app.route("/lab1/created")
 def created():
