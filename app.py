@@ -3,7 +3,7 @@ import datetime
 app = Flask(__name__)
 
 @app.errorhandler(404)
-def not_faund(err):
+def not_found(err):
     return "Такой страницы не существует :(", 404
 
 @app.route("/")
@@ -72,6 +72,21 @@ def counter():
         Дата и время: ''' + str(time) + '''<br>
         Запрошенный адрес: ''' + str(url) + '''<br>
         Ваш IP адрес: ''' + str(client_ip) + '''<br>
+        <a href="counter/clear">Сбросить счётчик</a>
+    </body>
+</html>
+'''
+
+@app.route("/counter/clear")
+def counter_clear():
+    global count
+    count = 0
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>Счётчик сброшен</h1>
+        <a href="/counter">Вернуться обратно к счётчику<a/>
     </body>
 </html>
 '''
