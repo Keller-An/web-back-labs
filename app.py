@@ -2,6 +2,9 @@ from flask import Flask, url_for, request, redirect
 import datetime
 app = Flask(__name__)
 
+@app.errorhandler(404)
+def not_faund(err):
+    return "Такой страницы не существует :(", 404
 @app.route("/")
 @app.route("/web")
 def web():
