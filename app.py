@@ -199,3 +199,70 @@ def created():
     </body>
 </html>
 ''', 201 
+
+@app.route("/400")
+def error400():
+    return '''
+<!doctype html>
+<html>
+    <head><title>400 Bad Request</title></head>
+    <body>
+        <h1>400 Bad Request</h1>
+        <p>Сервер не может или не будет обрабатывать запрос из-за чего-то, 
+        что воспринимается как ошибка клиента (например, неправильный синтаксис, 
+        формат или маршрутизация запроса).</p>
+    </body>
+</html>
+''', 400
+
+@app.route("/401")
+def error401():
+    return '''
+<!doctype html>
+<html>
+    <head><title>401 Unauthorized</title></head>
+    <body>
+    <h1>401 Unauthorized</h1>
+    <p>для доступа к запрашиваемому ресурсу требуется аутентификация.</p>
+'''
+
+@app.route("/402")
+def error402():
+    return '''
+<!doctype html>
+<html>
+    <head><title>402 Payment Required</title></head>
+    <body>
+    <h1>402 Payment Required</h1>
+    <p>Этот код предусмотрен для платных пользовательских сервисов</p>
+'''
+@app.route("/403")
+def error403():
+    return '''
+<!doctype html>
+<html>
+    <head><title>403 Forbidden</title></head>
+    <body>
+    <h1>403 Forbidden</h1>
+    <p>У вас нет прав для доступа к этому ресурсу</p>
+'''
+@app.route("/405")
+def error405():
+    return '''
+<!doctype html>
+<html>
+    <head><title>405 Method Not Allowed</title></head>
+    <body>
+    <h1>405 Method Not Allowed</h1>
+    <p>Метод запроса известен серверу, но не поддерживается целевым ресурсом.</p>
+'''
+@app.route("/418")
+def error418():
+    return '''
+<!doctype html>
+<html>
+    <head><title>418 I'm a teapot</title></head>
+    <body>
+    <h1>418 I'm a teapot</h1>
+    <p>Я чайник, я не могу заварить кофе, но могу сделать чай :)</p>
+'''
