@@ -192,7 +192,11 @@ def image():
         <img src="''' + path + '''">
     </body>
 </html>
-'''
+''', 200, {
+    'Content-Language': 'en',
+    'X-Content-Created': '23.09.2025',
+    'X-Author': 'Anastasia Mahmadbekova',
+}
 
 count = 0
 @app.route('/lab1/counter')
