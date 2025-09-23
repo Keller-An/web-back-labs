@@ -4,7 +4,53 @@ app = Flask(__name__)
 
 @app.errorhandler(404)
 def not_found(err):
-    return "Такой страницы не существует :(", 404
+    path = url_for("static", filename="окак.jpg")
+    return '''
+<!doctype html>
+<html>
+    <head>
+    <title>404 - Страница не найдена</title>
+        <style>
+            body {
+                background-color: #c7c7ff;
+                font-family: Jazz LET, fantasy;
+                text-align: center;
+                padding: 50px;
+                color: #563fb0;
+            }
+            h1 {
+                font-size: 64px;
+                margin: 0;
+                color: #43328a;
+            }
+            p {
+                font-size: 24px;
+            }
+            a {
+                display: inline-block;
+                margin-top: 20px;
+                background: #2e8b57;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+            }
+            a:hover {
+                background: #246b46;
+            }
+            img {
+                max-width: 400px;
+                margin-top: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>404</h1>
+        <p>Поздравляю, вы сломали браузер</p>
+        <p>Попробуйте вернуться на главную, хотя мало чем поможет</p>
+        <a href="/">На главную</a>
+        <br>
+        <img src="''' + path + '''">
+''', 404
 
 @app.route("/")
 @app.route("/index")
@@ -224,7 +270,7 @@ def error401():
     <body>
     <h1>401 Unauthorized</h1>
     <p>для доступа к запрашиваемому ресурсу требуется аутентификация.</p>
-'''
+''',401
 
 @app.route("/402")
 def error402():
@@ -235,7 +281,8 @@ def error402():
     <body>
     <h1>402 Payment Required</h1>
     <p>Этот код предусмотрен для платных пользовательских сервисов</p>
-'''
+''',402
+
 @app.route("/403")
 def error403():
     return '''
@@ -245,7 +292,8 @@ def error403():
     <body>
     <h1>403 Forbidden</h1>
     <p>У вас нет прав для доступа к этому ресурсу</p>
-'''
+''',403
+
 @app.route("/405")
 def error405():
     return '''
@@ -255,7 +303,8 @@ def error405():
     <body>
     <h1>405 Method Not Allowed</h1>
     <p>Метод запроса известен серверу, но не поддерживается целевым ресурсом.</p>
-'''
+''',405
+
 @app.route("/418")
 def error418():
     return '''
@@ -265,4 +314,4 @@ def error418():
     <body>
     <h1>418 I'm a teapot</h1>
     <p>Я чайник, я не могу заварить кофе, но могу сделать чай :)</p>
-'''
+''', 418
