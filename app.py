@@ -1,55 +1,93 @@
 from flask import Flask, url_for, request, redirect
 import datetime
+from werkzeug.exceptions import HTTPException
+
 app = Flask(__name__)
+visit_log = []
 
 @app.errorhandler(404)
 def not_found(err):
+
+    client_ip = request.remote_addr
+    access_time = datetime.datetime.now()
+    requested_url = request.url
+
+    log_entry = f'[{access_time.strftime("%Y-%m-%d %H:%M:%S")}, пользователь {client_ip}] зашёл на адрес: {requested_url}'
+    visit_log.append(log_entry)
+
     path = url_for("static", filename="окак.jpg")
-    return '''
+
+    journal_html = ''
+    for entry in reversed(visit_log[-10:]):
+        journal_html += f'<div class="log-entry">{entry}</div>'
+
+    return f'''
 <!doctype html>
 <html>
     <head>
     <title>404 - Страница не найдена</title>
         <style>
-            body {
+            body {{
                 background-color: #c7c7ff;
                 font-family: Jazz LET, fantasy;
                 text-align: center;
                 padding: 50px;
                 color: #563fb0;
-            }
-            h1 {
+            }}
+            h1 {{
                 font-size: 64px;
                 margin: 0;
                 color: #43328a;
-            }
-            p {
+            }}
+            p {{
                 font-size: 24px;
-            }
-            a {
+            }}
+            .user-info, .error-journal {{
+                text-align: left;
+                display: inline-block;
+                margin-top: 20px;
+                background: #e0e0ff;
+                padding: 15px;
+                border-radius: 8px;
+            }}
+            a {{
                 display: inline-block;
                 margin-top: 20px;
                 background: #2e8b57;
                 color: white;
                 padding: 10px 20px;
                 border-radius: 8px;
-            }
-            a:hover {
+            }}
+            a:hover {{
                 background: #246b46;
-            }
-            img {
+            }}
+            img {{
                 max-width: 400px;
                 margin-top: 30px;
-            }
+            }}
+            
         </style>
     </head>
     <body>
         <h1>404</h1>
         <p>Поздравляю, вы сломали браузер</p>
         <p>Попробуйте вернуться на главную, хотя мало чем поможет</p>
-        <a href="/">На главную</a>
-        <br>
-        <img src="''' + path + '''">
+        <div class="user-info">
+            <h3>Информация о запросе:</h3>
+            <p><strong>IP-адрес:</strong> {client_ip}</p>
+            <p><strong>Дата и время:</strong> {access_time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            <p><strong>Запрошенный URL:</strong> {requested_url}</p>
+            <a href="/" class="error-home-button">На главную</a>
+        </div>
+         
+        <div>
+            <img src="{path}" alt="404" class="error-image">
+        </div>
+
+        <div class="error-journal">
+            <h3>Журнал последних посещений:</h3>
+            {journal_html if journal_html else '<p>Пока нет записей в журнале</p>'}
+        </div>
 ''', 404
 
 @app.route("/")
@@ -154,6 +192,7 @@ def lab1():
             <li><a href="/lab1/counter">Счетчик</a></li>
             <li><a href="/lab1/counter/clear">Очиста счетчика</a></li>
             <li><a href="/lab1/info">Информация об авторе</a></li>
+            <li><a href="/lab1/created">Создание</a></li>
             <li><a href="/401">401</a></li>
             <li><a href="/402">402</a></li>
             <li><a href="/403">403</a></li>
@@ -174,7 +213,7 @@ def web():
                <h1>web-сервис на flask</h1>
                <a href="/author">author</a>
            </body>
-        <html>""", 200, {
+        </html>""", 200, {
             'X-Server': 'sample',
             'Content-Type': 'text/plain; charset=utf-8'
         }
@@ -191,7 +230,7 @@ def author():
                 <p>Студент: """ + name + """</p>
                 <p>Группа: """ + group + """</p>
                 <p>Факультет: """ + faculty + """</p>
-                <a href="/web">web</a>
+                <a href="/">web</a>
             </body>
         </html>"""
 
@@ -249,7 +288,7 @@ def counter_clear():
 <html>
     <body>
         <h1>Счётчик сброшен</h1>
-        <a href="/counter">Вернуться обратно к счётчику<a/>
+        <a href="/lab1/counter">Вернуться обратно к счётчику<a/>
     </body>
 </html>
 '''
