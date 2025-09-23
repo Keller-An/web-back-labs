@@ -315,3 +315,49 @@ def error418():
     <h1>418 I'm a teapot</h1>
     <p>Я чайник, я не могу заварить кофе, но могу сделать чай :)</p>
 ''', 418
+
+@app.route("/500test")
+def error500():
+    x = 1 / 0
+    return str(x)
+
+@app.errorhandler(500)
+def debug_error(err):
+    return '''
+<!doctype html>
+<html>
+    <head>
+        <style>
+            body {
+                text-align: center;
+                padding: 50px;
+            }
+            h1 {
+                font-size: 60px;
+                margin: 0;
+                color: #a00020;
+            }
+            p {
+                font-size: 20px;
+            }
+            a {
+                display: inline-block;
+                margin-top: 20px;
+                text-decoration: none;
+                background: #b00020;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                transition: background 0.3s;
+            }
+        </style>
+        <title>500 - Внутренняя ошибка сервера</title>
+    </head>
+    <body>
+        <h1>500</h1>
+        <p>На сервере произошла внутренняя ошибка</p>
+        <p>Попробуйте позже или вернитесь на главную страницу.</p>
+        <a href="/">На главную</a>
+    </body>
+</html>
+''', 500
