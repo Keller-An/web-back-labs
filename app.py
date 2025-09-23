@@ -142,6 +142,26 @@ def lab1():
             веб-приложений, сознательно предоставляющих лишь самые базовые возможности.
         </p>
         <a href="/">Вернуться на главную</a>
+
+        <h2>Список роутов</h2>
+        <ul>
+            <li><a href="/">/</a></li>
+            <li><a href="/index">/index</a></li>
+            <li><a href="/lab1">/lab1</a></li>
+            <li><a href="/lab1/web">/lab1/web</a></li>
+            <li><a href="/lab1/author">Автор</a></li>
+            <li><a href="/lab1/image">Изображение</a></li>
+            <li><a href="/lab1/counter">Счетчик</a></li>
+            <li><a href="/lab1/counter/clear">Очиста счетчика</a></li>
+            <li><a href="/lab1/info">Информация об авторе</a></li>
+            <li><a href="/401">401</a></li>
+            <li><a href="/402">402</a></li>
+            <li><a href="/403">403</a></li>
+            <li><a href="/404">404</a></li>
+            <li><a href="/405">405</a></li>
+            <li><a href="/418">418</a></li>
+            <li><a href="/500test">/500test</a></li>
+        </ul>
     </body>
 </html>
 '''
