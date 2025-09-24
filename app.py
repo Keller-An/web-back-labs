@@ -1,6 +1,6 @@
 from flask import Flask, url_for, request, redirect
 import datetime
-from werkzeug.exceptions import HTTPException
+
 
 app = Flask(__name__)
 visit_log = []
