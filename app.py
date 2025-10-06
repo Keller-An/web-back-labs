@@ -430,5 +430,5 @@ def a ():
     return 'со слэшем'
 
 @app.route('/lab2/a')
-def a ():
+def a2 ():
     return 'без слэша'
