@@ -433,7 +433,7 @@ def a ():
 def a2 ():
     return 'без слэша'
 
-flower_list = ('роза', 'тюльпан', 'пион', 'ромашка')
+flower_list = ['роза', 'тюльпан', 'пион', 'ромашка']
 
 @app.route('/lab2/flowers/<int:flower_id>')
 def flowers(flower_id):
