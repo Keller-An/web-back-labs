@@ -3,12 +3,24 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ name }}. Лабораторная работа {{ lab_number }}</title>
+        <title>
+            {% if name %}
+                {{ name }}
+            {% else %}
+                Анонимус
+            {% endif %}
+            -
+            {% if lab_number %}
+                Лабораторная работа {{ lab_number }}
+            {% else %}
+                Нет номера лабораторной работы
+            {% endif %}
+        </title>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     </head>
     <body>
         <header>
-            WEB-программирование, часть 2. Лабораторная работа {{ lab_number }}
+            WEB-программирование, часть 2. {% if lab_number %} Лабораторная работа {{ lab_number }} {% endif %}
         </header>
 
         <h2>Вычисления прямо в шаблоне:</h2>
@@ -22,7 +34,24 @@
         </main>
 
         <footer>
-            &copy; {{ name }}, {{ group }}, {{ course }} курс, 2025
+            &copy; 
+            {% if name %}
+                {{ name }},
+            {% else %}
+                Анонимус,
+            {% endif %}
+            
+            {% if group %}
+                {{ group }},
+            {% else %}
+                Группа неизвестна,
+            {% endif %}
+
+            {% if course %}
+                {{ course }} курс, 2025
+            {% else %}
+                Курс не указан, 2025
+            {% endif %}
         </footer>
     </body>
 </html>
