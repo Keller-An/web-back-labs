@@ -65,3 +65,18 @@ h1 {
     text-align: center;
     margin-top: 20px;
 }
+
+nav {
+    background: #5a75aa;
+    padding: 10px;
+    text-align: center;
+}
+nav a {
+    color: white;
+    font-weight: bold;
+    margin: 0 15px;
+    text-decoration: none;
+}
+nav a:hover {
+    text-decoration: underline;
+}
