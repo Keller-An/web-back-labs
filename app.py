@@ -578,3 +578,57 @@ def books():
         {"author": "Габриэль Гарсиа Маркес", "title": "Сто лет одиночества", "genre": "Магический реализм", "pages": 512}
     ]
     return render_template('books.html', books=book_list)
+
+
+
+items = [
+    {"name": "Котик 1", "desc": "Милый рыжий котик", "img": "1.jpg"},
+    {"name": "Котик 2", "desc": "Кот возмущается", "img": "2.jpg"},
+    {"name": "Котик 3", "desc": "Крутой кот", "img": "3.jpg"},
+    {"name": "Котик 4", "desc": "Кот не понял", "img": "4.jpg"},
+    {"name": "Котик 5", "desc": "Кот в недоумении", "img": "5.jpg"},
+    {"name": "Котик 6", "desc": "Кот смотрит на вас вопросительно", "img": "6.jpg"},
+    {"name": "Котик 7", "desc": "Йомайо", "img": "7.jpg"},
+    {"name": "Котик 8", "desc": "У кота рот смешной...", "img": "8.jpg"},
+    {"name": "Котик 9", "desc": "Нарисованный кот", "img": "9.jpg"},
+    {"name": "Котик 10", "desc": "Кот типо работает", "img": "10.jpg"},
+    {"name": "Котик 11", "desc": "Кот промок...", "img": "11.jpg"},
+    {"name": "Котик 12", "desc": "Чилловый кот", "img": "12.jpg"},
+    {"name": "Котик 13", "desc": "Сейлим в карты играет", "img": "13.jpg"},
+    {"name": "Котик 14", "desc": "Сейлим в гламурной одежде", "img": "14.jpg"},
+    {"name": "Котик 15", "desc": "Кот с наушниками", "img": "15.jpg"},
+    {"name": "Котик 16", "desc": "Три крутых кота", "img": "16.jpg"},
+    {"name": "Котик 17", "desc": "Кот дарит вам розу", "img": "17.jpg"},
+    {"name": "Котик 18", "desc": "Кот влюблен в вас", "img": "18.jpg"},
+    {"name": "Котик 19", "desc": "Три не менее крутых кота", "img": "19.jpg"},
+    {"name": "Котик 20", "desc": "Черный кот", "img": "20.jpg"},
+]
+
+@app.route("/lab2/cats")
+def show_cats():
+    html = '''
+    <!doctype html>
+    <html>
+        <head>
+            <title>Список котиков</title>
+            <style>
+                body { font-family: Arial; background: #f9f9f9; text-align: center; }
+                .item { display: inline-block; margin: 20px; border: 1px solid #ccc; border-radius: 10px; padding: 10px; background: #fff; width: 200px; }
+                img { width: 180px; height: 180px; object-fit: cover; border-radius: 10px; }
+                h3 { margin: 10px 0 5px; color: #333; }
+                p { margin: 0; color: #666; }
+            </style>
+        </head>
+        <body>
+            <h1>Список котиков</h1>
+            {% for item in items %}
+                <div class="item">
+                    <img src="{{ url_for('static', filename=item.img) }}" alt="{{ item.name }}">
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.desc }}</p>
+                </div>
+            {% endfor %}
+        </body>
+    </html>
+    '''
+    return render_template_string(html, items=items)
