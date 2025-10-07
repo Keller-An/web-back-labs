@@ -529,3 +529,35 @@ def lab2():
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
     return render_template('filter.html', phrase = phrase)
+
+
+# Перенаправление по умолчанию на /lab2/calc/1/1
+@app.route('/lab2/calc/')
+def calc_default():
+    return redirect('/lab2/calc/1/1')
+
+# Перенаправление, если задан только один параметр
+@app.route('/lab2/calc/<int:a>')
+def calc_one(a):
+    return redirect(f'/lab2/calc/{a}/1')
+
+@app.route('/lab2/calc/<int:a>/<int:b>')
+def calc_two(a, b):
+    html = f'''
+    <!doctype html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Расчёт с параметрами</title>
+        </head>
+        <body>
+            <h2>Расчёт с параметрами:</h2>
+            <p>{a} + {b} = {a + b}</p>
+            <p>{a} - {b} = {a - b}</p>
+            <p>{a} × {b} = {a * b}</p>
+            <p>{a} / {b} = {a / b if b != 0 else "деление на ноль"}</p>
+            <p>{a}<sup>{b}</sup> = {a ** b}</p>
+        </body>
+    </html>
+    '''
+    return render_template_string(html)
