@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная 2: Цветы{% endblock %}
+
+{% block main %}
+<div class="flowers-container">
+    <h1>Список цветов</h1>
+    
+    <ol class="flowers-list">
+        {% for flower in flowers %}
+        <li class="flower-item">
+            <span class="flower-name">{{ flower }}</span>
+            <span class="flower-price">{{ flower_prices.get(flower, 300) }} руб</span>
+            <a href="{{ url_for('delete_flower', flower_id=loop.index0) }}" class="delete-btn">удалить</a>
+        </li>
+        {% endfor %}
+    </ol>
+
+    <div class="total-price">
+        Общая стоимость: <strong>{{ total_price }} руб</strong>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('delete_all_flowers') }}" class="btn btn-danger">Удалить все цветы</a>
+        <a href="{{ url_for('rewrite_flowers') }}" class="btn btn-secondary">Восстановить стандартный список</a>
+    </div>
+
+    <div class="add-form">
+        <h3>Добавить новый цветок:</h3>
+        <form action="{{ url_for('add_flower_form') }}" method="post">
+            <input type="text" name="flower_name" placeholder="Название цветка" required>
+            <button class="btn btn-primary">Добавить</button>
+        </form>
+    </div>
+
+    <div class="back-link">
+        <a href="/lab2/">← Назад к лабораторной 2</a>
+    </div>
+</div>
+{% endblock %}
