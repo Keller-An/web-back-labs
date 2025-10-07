@@ -561,3 +561,20 @@ def calc_two(a, b):
     </html>
     '''
     return render_template_string(html)
+
+
+@app.route('/lab2/books')
+def books():
+    book_list = [
+        {"author": "Донна Тартт", "title": "Щегол", "genre": "Современная проза", "pages": 864},
+        {"author": "Стивен Кинг", "title": "Сияние", "genre": "Ужасы", "pages": 672},
+        {"author": "Фредрик Бакман", "title": "Вторая жизнь Уве", "genre": "Драма", "pages": 416},
+        {"author": "Эрих Мария Ремарк", "title": "Три товарища", "genre": "Роман", "pages": 480},
+        {"author": "Евгений Замятин", "title": "Мы", "genre": "Антиутопия", "pages": 320},
+        {"author": "Джордж Оруэлл", "title": "Скотный двор", "genre": "Сатира, антиутопия", "pages": 192},
+        {"author": "Дж. Р. Р. Толкин", "title": "Хоббит, или Туда и обратно", "genre": "Фэнтези", "pages": 208},
+        {"author": "Дж. К. Роулинг", "title": "Гарри Поттер и узник Азкабана", "genre": "Фэнтези", "pages": 528},
+        {"author": "Фёдор Достоевский", "title": "Идиот", "genre": "Роман", "pages": 736},
+        {"author": "Габриэль Гарсиа Маркес", "title": "Сто лет одиночества", "genre": "Магический реализм", "pages": 512}
+    ]
+    return render_template('books.html', books=book_list)
