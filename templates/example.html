@@ -23,14 +23,20 @@
             WEB-программирование, часть 2. {% if lab_number %} Лабораторная работа {{ lab_number }} {% endif %}
         </header>
 
+        <main>
+
         <h2>Вычисления прямо в шаблоне:</h2>
 
         <div class="expr">11 × 28 = {{ 11 * 28 }}</div>
         <div class="expr">3258 − 759 = {{ 3258 - 759 }}</div>
         <div class="expr">8452 ÷ 793 = {{ 8452 / 793 }}</div>
         <div class="expr">45<sup>8</sup> = {{ 45**8 }}</div>
-        <main>
-            основной контент
+        
+        <ul>
+            {% for f in fruits %}
+            <li>{{ loop.index }} - {{ f.name }}: {{ f.price }} &#8381;</li>
+            {% endfor %}
+        </ul>
         </main>
 
         <footer>
@@ -40,7 +46,7 @@
             {% else %}
                 Анонимус,
             {% endif %}
-            
+
             {% if group %}
                 {{ group }},
             {% else %}
