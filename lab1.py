@@ -1,10 +1,7 @@
-from flask import Blueprint, redirect, url_for, request, datetime  
-from lab1 import lab1
+from flask import Blueprint, redirect, url_for, request
+from datetime import datetime
 lab1= Blueprint('lab1', __name__)
 
-
-
-lab1.register_blueprint(lab1)
 
 
 @lab1.route("/lab1")
@@ -128,7 +125,7 @@ count = 0
 def counter():
     global count
     count += 1
-    time = datetime.datetime.today()
+    time = datetime.today()
     url = request.url
     client_ip = request.remote_addr
     return '''
@@ -179,7 +176,7 @@ def created():
 ''', 201 
 
 
-@lab2.route("/400")
+@lab1.route("/400")
 def error400():
     return '''
 <!doctype html>
@@ -195,7 +192,7 @@ def error400():
 ''', 400
 
 
-@lab2.route("/401")
+@lab1.route("/401")
 def error401():
     return '''
 <!doctype html>
@@ -207,7 +204,7 @@ def error401():
 ''',401
 
 
-@lab2.route("/402")
+@lab1.route("/402")
 def error402():
     return '''
 <!doctype html>
@@ -219,7 +216,7 @@ def error402():
 ''',402
 
 
-@lab2.route("/403")
+@lab1.route("/403")
 def error403():
     return '''
 <!doctype html>
@@ -231,7 +228,7 @@ def error403():
 ''',403
 
 
-@lab2.route("/405")
+@lab1.route("/405")
 def error405():
     return '''
 <!doctype html>
@@ -243,7 +240,7 @@ def error405():
 ''',405
 
 
-@lab2.route("/418")
+@lab1.route("/418")
 def error418():
     return '''
 <!doctype html>
@@ -255,7 +252,7 @@ def error418():
 ''', 418
 
 
-@lab2.route("/500test")
+@lab1.route("/500test")
 def error500():
     x = 1 / 0
     return str(x)

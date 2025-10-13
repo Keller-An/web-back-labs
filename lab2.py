@@ -1,10 +1,9 @@
 import random
 from flask import Blueprint, abort, redirect, render_template, render_template_string, request 
-from lab2 import lab2
 lab2= Blueprint('lab2', __name__)
 
 
-lab2.register_blueprint(lab2)
+
 
 @lab2.route('/lab2/a/')
 def a ():
@@ -40,7 +39,7 @@ def all_flowers():
 def add_flower_form():
     name = request.form.get('flower_name', '').strip()
     if name:
-        flower_list.lab2end(name)
+        flower_list.append(name)
         flower_prices[name] = random.randint(100, 400)
     return redirect('/lab2/all_flowers')
 
@@ -82,7 +81,7 @@ def example():
 
 
 @lab2.route('/lab2/')
-def lab2():
+def lab2_index():
     return render_template('lab2.html') 
 
 

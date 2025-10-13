@@ -1,11 +1,13 @@
-from flask import Flask, url_for, request, redirect
-import datetime
+from flask import Flask, url_for, request
+from datetime import datetime 
 from lab1 import lab1
 from lab2 import lab2 
+from lab3 import lab3
 
 app = Flask(__name__)
 app.register_blueprint(lab1)
 app.register_blueprint(lab2)
+app.register_blueprint(lab3)
 visit_log = []
 
 
@@ -13,7 +15,7 @@ visit_log = []
 def not_found(err):
 
     client_ip = request.remote_addr
-    access_time = datetime.datetime.now()
+    access_time = datetime.now()
     requested_url = request.url
 
     log_entry = f'[{access_time.strftime("%Y-%m-%d %H:%M:%S")}, пользователь {client_ip}] зашёл на адрес: {requested_url}'
@@ -140,8 +142,9 @@ def index():
         </header>
 
         <nav>
-            <li><a href="/lab1">Лабораторная 1</a></li>
-            <li><a href="/lab2/">Лабораторная 2</a></li>
+              <li><a href="/lab1">Лабораторная 1</a></li>
+              <li><a href="/lab2/">Лабораторная 2</a></li>
+              <li><a href="/lab3/">Лабораторная 3</a></li>
         </nav>
 
         <footer>

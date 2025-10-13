@@ -11,7 +11,7 @@
         <li class="flower-item">
             <span class="flower-name">{{ flower }}</span>
             <span class="flower-price">{{ flower_prices.get(flower, 300) }} руб</span>
-            <a href="{{ url_for('delete_flower', flower_id=loop.index0) }}" class="delete-btn">удалить</a>
+            <a href="{{ url_for('lab2.delete_flower', flower_id=loop.index0) }}" class="delete-btn">удалить</a>
         </li>
         {% endfor %}
     </ol>
