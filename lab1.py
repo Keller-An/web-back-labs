@@ -1,9 +1,9 @@
-from flask import Blueprint, redirect, url_for
+from flask import Blueprint, redirect, url_for, request, datetime  
 from lab1 import lab1
 lab1= Blueprint('lab1', __name__)
 
 
-lab1 = Flask(__name__)
+
 lab1.register_blueprint(lab1)
 
 
@@ -160,9 +160,11 @@ def counter_clear():
 </html>
 '''
 
+
 @lab1.route("/lab1/info")
 def info():
     return redirect("/lab1/author")
+
 
 @lab1.route("/lab1/created")
 def created():
@@ -175,3 +177,85 @@ def created():
     </body>
 </html>
 ''', 201 
+
+
+@lab2.route("/400")
+def error400():
+    return '''
+<!doctype html>
+<html>
+    <head><title>400 Bad Request</title></head>
+    <body>
+        <h1>400 Bad Request</h1>
+        <p>Сервер не может или не будет обрабатывать запрос из-за чего-то, 
+        что воспринимается как ошибка клиента (например, неправильный синтаксис, 
+        формат или маршрутизация запроса).</p>
+    </body>
+</html>
+''', 400
+
+
+@lab2.route("/401")
+def error401():
+    return '''
+<!doctype html>
+<html>
+    <head><title>401 Unauthorized</title></head>
+    <body>
+    <h1>401 Unauthorized</h1>
+    <p>для доступа к запрашиваемому ресурсу требуется аутентификация.</p>
+''',401
+
+
+@lab2.route("/402")
+def error402():
+    return '''
+<!doctype html>
+<html>
+    <head><title>402 Payment Required</title></head>
+    <body>
+    <h1>402 Payment Required</h1>
+    <p>Этот код предусмотрен для платных пользовательских сервисов</p>
+''',402
+
+
+@lab2.route("/403")
+def error403():
+    return '''
+<!doctype html>
+<html>
+    <head><title>403 Forbidden</title></head>
+    <body>
+    <h1>403 Forbidden</h1>
+    <p>У вас нет прав для доступа к этому ресурсу</p>
+''',403
+
+
+@lab2.route("/405")
+def error405():
+    return '''
+<!doctype html>
+<html>
+    <head><title>405 Method Not Allowed</title></head>
+    <body>
+    <h1>405 Method Not Allowed</h1>
+    <p>Метод запроса известен серверу, но не поддерживается целевым ресурсом.</p>
+''',405
+
+
+@lab2.route("/418")
+def error418():
+    return '''
+<!doctype html>
+<html>
+    <head><title>418 I'm a teapot</title></head>
+    <body>
+    <h1>418 I'm a teapot</h1>
+    <p>Я чайник, я не могу заварить кофе, но могу сделать чай :)</p>
+''', 418
+
+
+@lab2.route("/500test")
+def error500():
+    x = 1 / 0
+    return str(x)
