@@ -31,9 +31,10 @@
         </header>
 
          <nav>
-        <a href="/">Главная</a>
-        <a href="/lab1">Лабораторная 1</a>
-        <a href="/lab2/">Лабораторная 2</a>
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('lab1.lab') }}">Лабораторная 1</a>
+        <a href="{{ url_for('lab2.lab2_index') }}">Лабораторная 2</a>
+        <a href="{{ url_for('lab3.lab') }}">Лабораторная 3</a>
         </nav>
         
         <main>
