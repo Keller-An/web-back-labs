@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{# номер лабораторной работы: #}
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{# основной контент: #}
+{% block main %}
+    <h1>Cookies</h1>
+    <form>
+        <div>
+            <label for="color">Выберете цвет текста:</label>
+            <input type="color" id="color" name="color" value="{{ color or '' }}">
+        </div>
+
+        <div>
+            <label for="bgcolor">Выберете цвет фона:</label>
+            <input type="color" id="bgcolor" name="bgcolor" value="{{ bgcolor or '' }}">
+        </div>
+
+        <div>
+            <label for="fontsize">Размер шрифта:</label>
+            <select id="fontsize" name="fontsize">
+                <option value="14pt" {% if fontsize == '14pt' %}selected{% endif %}>Обычный (14pt)</option>
+                <option value="16pt" {% if fontsize == '16pt' %}selected{% endif %}>Средний (16pt)</option>
+                <option value="18pt" {% if fontsize == '18pt' %}selected{% endif %}>Крупный (18pt)</option>
+                <option value="20pt" {% if fontsize == '20pt' %}selected{% endif %}>Очень крупный (20pt)</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="fontstyle">Стиль шрифта:</label>
+            <select id="fontstyle" name="fontstyle">
+                <option value="normal" {% if fontstyle == 'normal' %}selected{% endif %}>Обычный</option>
+                <option value="italic" {% if fontstyle == 'italic' %}selected{% endif %}>Курсив</option>
+                <option value="bold" {% if fontstyle == 'bold' %}selected{% endif %}>Полужирный</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit">OK</button>
+        </div>
+    </form>
+{% endblock %}

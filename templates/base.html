@@ -6,6 +6,24 @@
         <title>Махмадбекова Анастасия. {% block lab %}{% endblock %}</title>
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons8-червы-pastel-color-16.png') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+        <style>
+            body {
+                {% if request.cookies.get('color') %}
+                    color: {{ request.cookies.get('color') }};
+                {% endif %}
+                {% if request.cookies.get('bgcolor') %}
+                    background-color: {{ request.cookies.get('bgcolor') }};
+                {% endif %}
+                {% if request.cookies.get('fontsize') %}
+                    font-size: {{ request.cookies.get('fontsize') }};;
+                {% endif %}
+                {% if request.cookies.get('fontstyle') == 'italic' %}
+                    font-style: italic;
+                {% elif request.cookies.get('fontstyle') == 'bold' %}
+                    font-weight: bold;
+                {% endif %}
+            }
+        </style>
     </head>
     <body>
         <header>
