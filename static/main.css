@@ -259,3 +259,49 @@ input[type="checkbox"] {
     font-weight: 600;
     color: #354f6a;
 }
+
+.ticket-form {
+    max-width: 500px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.ticket-form div {
+    margin-bottom: 10px;
+}
+
+.ticket-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.ticket-form input,
+.ticket-form select {
+    width: 100%;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.ticket-form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.ticket-form button:hover {
+    background-color: #45a049;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-left: 5px;
+}

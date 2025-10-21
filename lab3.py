@@ -107,3 +107,70 @@ def settings():
         fontstyle=fontstyle
     ))
     return resp
+
+
+@lab3.route('/lab3/ticket', methods=['GET', 'POST'])
+def ticket():
+    errors = {}
+    data = {}
+
+    if request.method == 'POST':
+        # Получаем данные из формы
+        data['fio'] = request.form.get('fio', '').strip()
+        data['shelf'] = request.form.get('shelf', '')
+        data['linen'] = request.form.get('linen')
+        data['baggage'] = request.form.get('baggage')
+        data['age'] = request.form.get('age', '')
+        data['from_city'] = request.form.get('from_city', '').strip()
+        data['to_city'] = request.form.get('to_city', '').strip()
+        data['date'] = request.form.get('date', '')
+        data['insurance'] = request.form.get('insurance')
+
+        # Проверка заполненности
+        for field, value in data.items():
+            if field not in ['linen', 'baggage', 'insurance'] and not value:
+                errors[field] = 'Поле обязательно для заполнения!'
+
+        # Проверка возраста
+        if data['age']:
+            try:
+                age = int(data['age'])
+                if not (1 <= age <= 120):
+                    errors['age'] = 'Возраст должен быть от 1 до 120 лет!'
+            except ValueError:
+                errors['age'] = 'Возраст должен быть числом!'
+        else:
+            age = 0
+
+        # Если ошибок нет → считаем билет
+        if not errors:
+            # Расчёт цены
+            if age < 18:
+                base_price = 700
+                ticket_type = 'Детский билет'
+            else:
+                base_price = 1000
+                ticket_type = 'Взрослый билет'
+
+            # Полка
+            if data['shelf'] in ['нижняя', 'нижняя боковая']:
+                base_price += 100
+
+            # Опции
+            if data['linen']:
+                base_price += 75
+            if data['baggage']:
+                base_price += 250
+            if data['insurance']:
+                base_price += 150
+
+            price = base_price
+
+            return render_template(
+                'lab3/ticket_result.html',
+                data=data,
+                ticket_type=ticket_type,
+                price=price
+            )
+
+    return render_template('lab3/ticket_form.html', errors=errors, data=data)

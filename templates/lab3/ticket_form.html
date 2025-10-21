@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<h1>Железнодорожный билет</h1>
+
+<form method="post" class="ticket-form">
+    <div>
+        <label>ФИО пассажира:</label>
+        <input type="text" name="fio" value="{{ data.fio or '' }}">
+        <span class="error">{{ errors.fio }}</span>
+    </div>
+
+    <div>
+        <label>Полка:</label>
+        <select name="shelf">
+            <option value="">-- выберите --</option>
+            <option value="нижняя" {{ 'selected' if data.shelf == 'нижняя' }}>Нижняя</option>
+            <option value="верхняя" {{ 'selected' if data.shelf == 'верхняя' }}>Верхняя</option>
+            <option value="верхняя боковая" {{ 'selected' if data.shelf == 'верхняя боковая' }}>Верхняя боковая</option>
+            <option value="нижняя боковая" {{ 'selected' if data.shelf == 'нижняя боковая' }}>Нижняя боковая</option>
+        </select>
+        <span class="error">{{ errors.shelf }}</span>
+    </div>
+
+    <div>
+        <label><input type="checkbox" name="linen" {% if data.linen %}checked{% endif %}> С бельём</label>
+    </div>
+
+    <div>
+        <label><input type="checkbox" name="baggage" {% if data.baggage %}checked{% endif %}> С багажом</label>
+    </div>
+
+    <div>
+        <label>Возраст:</label>
+        <input type="number" name="age" value="{{ data.age or '' }}">
+        <span class="error">{{ errors.age }}</span>
+    </div>
+
+    <div>
+        <label>Пункт выезда:</label>
+        <input type="text" name="from_city" value="{{ data.from_city or '' }}">
+        <span class="error">{{ errors.from_city }}</span>
+    </div>
+
+    <div>
+        <label>Пункт назначения:</label>
+        <input type="text" name="to_city" value="{{ data.to_city or '' }}">
+        <span class="error">{{ errors.to_city }}</span>
+    </div>
+
+    <div>
+        <label>Дата поездки:</label>
+        <input type="date" name="date" value="{{ data.date or '' }}">
+        <span class="error">{{ errors.date }}</span>
+    </div>
+
+    <div>
+        <label><input type="checkbox" name="insurance" {% if data.insurance %}checked{% endif %}> Нужна страховка</label>
+    </div>
+
+    <div>
+        <button type="submit">Оформить билет</button>
+    </div>
+</form>
+{% endblock %}
