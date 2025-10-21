@@ -21,7 +21,7 @@ def not_found(err):
     log_entry = f'[{access_time.strftime("%Y-%m-%d %H:%M:%S")}, пользователь {client_ip}] зашёл на адрес: {requested_url}'
     visit_log.append(log_entry)
 
-    path = url_for("static", filename="окак.jpg")
+    path = url_for("static", filename="lab1/окак.jpg")
 
     journal_html = ''
     for entry in reversed(visit_log[-10:]):

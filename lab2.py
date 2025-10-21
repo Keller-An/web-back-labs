@@ -1,5 +1,5 @@
 import random
-from flask import Blueprint, abort, redirect, render_template, render_template_string, request 
+from flask import Blueprint, abort, redirect, render_template, render_template_string, request, url_for
 lab2= Blueprint('lab2', __name__)
 
 
@@ -28,7 +28,7 @@ flower_prices = {
 @lab2.route('/lab2/all_flowers')
 def all_flowers():
     total_price = sum(flower_prices.get(f, 300) for f in flower_list)
-    return render_template('flowers.html',
+    return render_template('lab2/flowers.html',
                            flowers=flower_list,
                            flower_prices=flower_prices,
                            total_price=total_price)
@@ -41,7 +41,7 @@ def add_flower_form():
     if name:
         flower_list.append(name)
         flower_prices[name] = random.randint(100, 400)
-    return redirect('/lab2/all_flowers')
+    return redirect(url_for('lab2.all_flowers'))
 
 
 @lab2.route('/lab2/del_flower/<int:flower_id>')
@@ -49,20 +49,20 @@ def delete_flower(flower_id):
     if flower_id < 0 or flower_id >= len(flower_list):
         abort(404)
     flower_list.pop(flower_id)
-    return redirect('/lab2/all_flowers')
+    return redirect(url_for('lab2.all_flowers'))
 
 
 @lab2.route('/lab2/del_all_flowers')
 def delete_all_flowers():
     flower_list.clear()
-    return redirect('/lab2/all_flowers')
+    return redirect(url_for('lab2.all_flowers'))
 
 
 @lab2.route('/lab2/flowers/rewrite')
 def rewrite_flowers():
     flower_list.clear()
     flower_list.extend(['Роза', 'Ромашка', 'Одуванчик', 'Незабудка'])
-    return redirect('/lab2/all_flowers')
+    return redirect(url_for('lab2.all_flowers'))
 
 
 @lab2.route('/lab2/example')
@@ -75,32 +75,32 @@ def example():
         {'name': 'мандарины', 'price':95},
         {'name': 'манго', 'price':321},
         ]
-    return render_template('example.html',
+    return render_template('lab2/example.html',
                            name=name, lab_number=lab_number, group=group,
                            course=course, fruits=fruits)
 
 
 @lab2.route('/lab2/')
 def lab2_index():
-    return render_template('lab2.html') 
+    return render_template('lab2/lab2.html') 
 
 
 @lab2.route('/lab2/filters')
 def filters():
     phrase = "О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase = phrase)
+    return render_template('lab2/filter.html', phrase = phrase)
 
 
 # Перенаправление по умолчанию на /lab2/calc/1/1
 @lab2.route('/lab2/calc/')
 def calc_default():
-    return redirect('/lab2/calc/1/1')
+    return redirect(url_for('lab2.calc_two', a=1, b=1))
 
 
 # Перенаправление, если задан только один параметр
 @lab2.route('/lab2/calc/<int:a>')
 def calc_one(a):
-    return redirect(f'/lab2/calc/{a}/1')
+    return redirect(url_for('lab2.calc_two', a=a, b=1))
 
 
 @lab2.route('/lab2/calc/<int:a>/<int:b>')
@@ -139,31 +139,31 @@ def books():
         {"author": "Фёдор Достоевский", "title": "Идиот", "genre": "Роман", "pages": 736},
         {"author": "Габриэль Гарсиа Маркес", "title": "Сто лет одиночества", "genre": "Магический реализм", "pages": 512}
     ]
-    return render_template('books.html', books=book_list)
+    return render_template('lab2/books.html', books=book_list)
 
 
 
 items = [
-    {"name": "Котик 1", "desc": "Милый рыжий котик", "img": "1.jpg"},
-    {"name": "Котик 2", "desc": "Кот возмущается", "img": "2.jpg"},
-    {"name": "Котик 3", "desc": "Крутой кот", "img": "3.jpg"},
-    {"name": "Котик 4", "desc": "Кот не понял", "img": "4.jpg"},
-    {"name": "Котик 5", "desc": "Кот в недоумении", "img": "5.jpg"},
-    {"name": "Котик 6", "desc": "Кот смотрит на вас вопросительно", "img": "6.jpg"},
-    {"name": "Котик 7", "desc": "Йомайо", "img": "7.jpg"},
-    {"name": "Котик 8", "desc": "У кота рот смешной...", "img": "8.jpg"},
-    {"name": "Котик 9", "desc": "Нарисованный кот", "img": "9.jpg"},
-    {"name": "Котик 10", "desc": "Кот типо работает", "img": "10.jpg"},
-    {"name": "Котик 11", "desc": "Кот промок...", "img": "11.jpg"},
-    {"name": "Котик 12", "desc": "Чилловый кот", "img": "12.jpg"},
-    {"name": "Котик 13", "desc": "Сейлим в карты играет", "img": "13.jpg"},
-    {"name": "Котик 14", "desc": "Сейлим в гламурной одежде", "img": "14.jpg"},
-    {"name": "Котик 15", "desc": "Кот с наушниками", "img": "15.jpg"},
-    {"name": "Котик 16", "desc": "Три крутых кота", "img": "16.jpg"},
-    {"name": "Котик 17", "desc": "Кот дарит вам розу", "img": "17.jpg"},
-    {"name": "Котик 18", "desc": "Кот влюблен в вас", "img": "18.jpg"},
-    {"name": "Котик 19", "desc": "Три не менее крутых кота", "img": "19.jpg"},
-    {"name": "Котик 20", "desc": "Черный кот", "img": "20.jpg"},
+    {"name": "Котик 1", "desc": "Милый рыжий котик", "img": "lab2/1.jpg"},
+    {"name": "Котик 2", "desc": "Кот возмущается", "img": "lab2/2.jpg"},
+    {"name": "Котик 3", "desc": "Крутой кот", "img": "lab2/3.jpg"},
+    {"name": "Котик 4", "desc": "Кот не понял", "img": "lab2/4.jpg"},
+    {"name": "Котик 5", "desc": "Кот в недоумении", "img": "lab2/5.jpg"},
+    {"name": "Котик 6", "desc": "Кот смотрит на вас вопросительно", "img": "lab2/6.jpg"},
+    {"name": "Котик 7", "desc": "Йомайо", "img": "lab2/7.jpg"},
+    {"name": "Котик 8", "desc": "У кота рот смешной...", "img": "lab2/8.jpg"},
+    {"name": "Котик 9", "desc": "Нарисованный кот", "img": "lab2/9.jpg"},
+    {"name": "Котик 10", "desc": "Кот типо работает", "img": "lab2/10.jpg"},
+    {"name": "Котик 11", "desc": "Кот промок...", "img": "lab2/11.jpg"},
+    {"name": "Котик 12", "desc": "Чилловый кот", "img": "lab2/12.jpg"},
+    {"name": "Котик 13", "desc": "Сейлим в карты играет", "img": "lab2/13.jpg"},
+    {"name": "Котик 14", "desc": "Сейлим в гламурной одежде", "img": "lab2/14.jpg"},
+    {"name": "Котик 15", "desc": "Кот с наушниками", "img": "lab2/15.jpg"},
+    {"name": "Котик 16", "desc": "Три крутых кота", "img": "lab2/16.jpg"},
+    {"name": "Котик 17", "desc": "Кот дарит вам розу", "img": "lab2/17.jpg"},
+    {"name": "Котик 18", "desc": "Кот влюблен в вас", "img": "lab2/18.jpg"},
+    {"name": "Котик 19", "desc": "Три не менее крутых кота", "img": "lab2/19.jpg"},
+    {"name": "Котик 20", "desc": "Черный кот", "img": "lab2/20.jpg"},
 ]
 
 
