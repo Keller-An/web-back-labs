@@ -115,7 +115,7 @@ def ticket():
     data = {}
 
     if request.method == 'POST':
-        # Получаем данные из формы
+        
         data['fio'] = request.form.get('fio', '').strip()
         data['shelf'] = request.form.get('shelf', '')
         data['linen'] = request.form.get('linen')
@@ -126,12 +126,12 @@ def ticket():
         data['date'] = request.form.get('date', '')
         data['insurance'] = request.form.get('insurance')
 
-        # Проверка заполненности
+        
         for field, value in data.items():
             if field not in ['linen', 'baggage', 'insurance'] and not value:
                 errors[field] = 'Поле обязательно для заполнения!'
 
-        # Проверка возраста
+        
         if data['age']:
             try:
                 age = int(data['age'])
@@ -142,9 +142,7 @@ def ticket():
         else:
             age = 0
 
-        # Если ошибок нет → считаем билет
         if not errors:
-            # Расчёт цены
             if age < 18:
                 base_price = 700
                 ticket_type = 'Детский билет'
@@ -152,11 +150,9 @@ def ticket():
                 base_price = 1000
                 ticket_type = 'Взрослый билет'
 
-            # Полка
             if data['shelf'] in ['нижняя', 'нижняя боковая']:
                 base_price += 100
 
-            # Опции
             if data['linen']:
                 base_price += 75
             if data['baggage']:
@@ -183,4 +179,71 @@ def clear_settings():
     resp.delete_cookie('bgcolor')
     resp.delete_cookie('fontsize')
     resp.delete_cookie('fontstyle')
+    return resp
+
+
+
+@lab3.route('/lab3/cars')
+def cars():
+    cars = [
+        {'name': 'Mercedes-Benz S-Class', 'price': 12500000, 'brand': 'Mercedes-Benz', 'color': 'черный', 'weight': 1950},
+        {'name': 'BMW 7 Series', 'price': 11800000, 'brand': 'BMW', 'color': 'серый', 'weight': 1920},
+        {'name': 'Audi A8', 'price': 11500000, 'brand': 'Audi', 'color': 'белый', 'weight': 1890},
+        {'name': 'Lexus LS 500', 'price': 10800000, 'brand': 'Lexus', 'color': 'синий', 'weight': 1980},
+        {'name': 'Porsche Panamera', 'price': 14500000, 'brand': 'Porsche', 'color': 'красный', 'weight': 1870},
+        {'name': 'Jaguar XJ', 'price': 10200000, 'brand': 'Jaguar', 'color': 'черный', 'weight': 1820},
+        {'name': 'Tesla Model S Plaid', 'price': 12500000, 'brand': 'Tesla', 'color': 'белый', 'weight': 2160},
+        {'name': 'Bentley Continental GT', 'price': 23500000, 'brand': 'Bentley', 'color': 'темно-синий', 'weight': 2260},
+        {'name': 'Rolls-Royce Ghost', 'price': 33000000, 'brand': 'Rolls-Royce', 'color': 'серебристый', 'weight': 2470},
+        {'name': 'Aston Martin DB11', 'price': 26500000, 'brand': 'Aston Martin', 'color': 'темно-зеленый', 'weight': 1760},
+        {'name': 'Ferrari Roma', 'price': 31000000, 'brand': 'Ferrari', 'color': 'красный', 'weight': 1570},
+        {'name': 'Lamborghini Huracán', 'price': 34000000, 'brand': 'Lamborghini', 'color': 'желтый', 'weight': 1420},
+        {'name': 'McLaren 720S', 'price': 35500000, 'brand': 'McLaren', 'color': 'оранжевый', 'weight': 1415},
+        {'name': 'Maserati Quattroporte', 'price': 11700000, 'brand': 'Maserati', 'color': 'серый', 'weight': 1900},
+        {'name': 'Porsche 911 Turbo S', 'price': 28500000, 'brand': 'Porsche', 'color': 'белый', 'weight': 1640},
+        {'name': 'Bentley Flying Spur', 'price': 26500000, 'brand': 'Bentley', 'color': 'черный', 'weight': 2435},
+        {'name': 'Rolls-Royce Cullinan', 'price': 43000000, 'brand': 'Rolls-Royce', 'color': 'темно-серый', 'weight': 2660},
+        {'name': 'Ferrari SF90 Stradale', 'price': 48000000, 'brand': 'Ferrari', 'color': 'красный', 'weight': 1570},
+        {'name': 'Lamborghini Aventador SVJ', 'price': 52000000, 'brand': 'Lamborghini', 'color': 'зеленый', 'weight': 1525},
+        {'name': 'Bugatti Chiron', 'price': 230000000, 'brand': 'Bugatti', 'color': 'черно-синий', 'weight': 1995}
+    ]
+
+    min_price_cookie = request.cookies.get('min')
+    max_price_cookie = request.cookies.get('max')
+    min_user = request.args.get('min', min_price_cookie)
+    max_user = request.args.get('max', max_price_cookie)
+
+    if request.args.get('reset'):
+        resp = make_response(redirect('/lab3/cars'))
+        resp.delete_cookie('min')
+        resp.delete_cookie('max')
+        return resp
+
+    # Фильтрация по цене
+    filtered = cars
+    try:
+        if min_user or max_user:
+            min_user = int(min_user) if min_user else min(car['price'] for car in cars)
+            max_user = int(max_user) if max_user else max(car['price'] for car in cars)
+            if min_user > max_user:
+                min_user, max_user = max_user, min_user
+            filtered = [c for c in cars if min_user <= c['price'] <= max_user]
+    except ValueError:
+        min_user = max_user = None
+
+    resp = make_response(render_template(
+        'lab3/cars.html',
+        cars=filtered,
+        total=len(filtered),
+        min_price=min(car['price'] for car in cars),
+        max_price=max(car['price'] for car in cars),
+        min_user=min_user,
+        max_user=max_user
+    ))
+
+    if min_user is not None:
+        resp.set_cookie('min', str(min_user))
+    if max_user is not None:
+        resp.set_cookie('max', str(max_user))
+
     return resp

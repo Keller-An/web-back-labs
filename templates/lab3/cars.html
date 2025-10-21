@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<h1>Элитные автомобили💅🏻🏎️</h1>
+
+<form method="get">
+    <div>
+        <label>Минимальная цена:</label>
+        <input type="number" name="min" placeholder="{{ min_price }}" value="{{ min_user or '' }}">
+    </div>
+    <div>
+        <label>Максимальная цена:</label>
+        <input type="number" name="max" placeholder="{{ max_price }}" value="{{ max_user or '' }}">
+    </div>
+    <div>
+        <button type="submit">Искать</button>
+        <button type="submit" name="reset" value="1">Сброс</button>
+    </div>
+</form>
+
+<p>Найдено: {{ total }} {{ "автомобиль" if total==1 else "автомобилей" }}</p>
+
+{% if total == 0 %}
+<p>Не найдено ни одного автомобиля</p>
+{% else %}
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Бренд</th>
+        <th>Цвет</th>
+        <th>Вес (кг)</th>
+        <th>Цена (руб)</th>
+    </tr>
+    {% for car in cars %}
+    <tr>
+        <td>{{ car.name }}</td>
+        <td>{{ car.brand }}</td>
+        <td>{{ car.color }}</td>
+        <td>{{ car.weight }}</td>
+        <td>{{ car.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}
