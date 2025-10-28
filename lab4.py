@@ -248,3 +248,97 @@ def grain_order():
 
     message = f'Заказ успешно сформирован. Вы заказали зерно: {grain}. Вес: {weight} т. Сумма к оплате: {total:.2f} руб.'
     return render_template('lab4/grain-order.html', message=message, discount_text=discount_text, grain=grain, weight=weight)
+
+
+
+#Регистрация пользователя
+@lab4.route('/lab4/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('lab4/register.html', error='', login='', name='')
+    
+    login_input = request.form.get('login', '').strip()
+    name_input = request.form.get('name', '').strip()
+    password_input = request.form.get('password', '').strip()
+    confirm_input = request.form.get('confirm', '').strip()
+    gender_input = request.form.get('gender', '').strip()
+
+    # проверки
+    if not login_input or not name_input or not password_input or not confirm_input:
+        return render_template('lab4/register.html', error='Все поля обязательны!', login=login_input, name=name_input)
+    if password_input != confirm_input:
+        return render_template('lab4/register.html', error='Пароли не совпадают!', login=login_input, name=name_input)
+    if any(u['login'] == login_input for u in users):
+        return render_template('lab4/register.html', error='Такой логин уже существует!', login=login_input, name=name_input)
+
+    # добавляем пользователя в массив
+    users.append({
+        'login': login_input,
+        'password': password_input,
+        'name': name_input,
+        'gender': gender_input
+    })
+
+    # автоматически авторизуем
+    session['login'] = login_input
+    return redirect('/lab4/users')
+
+
+#Просмотр списка пользователей
+@lab4.route('/lab4/users')
+def users_list():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+    
+    current_user = session['login']
+    current = next((u for u in users if u['login'] == current_user), None)
+    return render_template('lab4/users.html', users=users, current_user=current_user, name=current['name'])
+ 
+
+#Удаление пользователя
+@lab4.route('/lab4/delete', methods=['POST'])
+def delete_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    login = session['login']
+    global users
+    users = [u for u in users if u['login'] != login]
+    session.pop('login', None)
+    return redirect('/lab4/login')
+
+
+#Редактирование пользователя
+@lab4.route('/lab4/edit', methods=['GET', 'POST'])
+def edit_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    login = session['login']
+    user = next((u for u in users if u['login'] == login), None)
+    if not user:
+        return redirect('/lab4/login')
+
+    if request.method == 'GET':
+        return render_template('lab4/edit.html', user=user, error='')
+
+    new_login = request.form.get('login', '').strip()
+    new_name = request.form.get('name', '').strip()
+    new_password = request.form.get('password', '').strip()
+    confirm = request.form.get('confirm', '').strip()
+
+    # проверки
+    if not new_login or not new_name:
+        return render_template('lab4/edit.html', user=user, error='Имя и логин обязательны!')
+
+    if new_password or confirm:
+        if new_password != confirm:
+            return render_template('lab4/edit.html', user=user, error='Пароли не совпадают!')
+        else:
+            user['password'] = new_password
+
+    user['login'] = new_login
+    user['name'] = new_name
+    session['login'] = new_login
+
+    return redirect('/lab4/users')

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block lab %}Пользователи{% endblock %}
+
+{% block main %}
+<div class="users-page">
+    <div class="users-container">
+    <h1>👥 Список пользователей</h1>
+
+    <table>
+        <tr>
+            <th>Имя</th>
+            <th>Логин</th>
+        </tr>
+        {% for u in users %}
+            <tr {% if u.login == current_user %}style="background-color:#e8f5e9;font-weight:bold;"{% endif %}>
+                <td>{{ u.name }}</td>
+                <td>{{ u.login }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="user-info">
+        Вы вошли как <strong>{{ name }}</strong>
+    </div>
+
+    <div class="buttons">
+        <form action="/lab4/delete" method="post">
+            <button class="btn btn-red" type="submit">Удалить свой аккаунт</button>
+        </form>
+        <a href="/lab4/edit" class="btn btn-green">Редактировать</a>
+        <form id="logoutForm" action="/lab4/logout" method="post">
+            <button class="btn btn-gray" type="submit">Выйти</button>
+        </form>
+        <a href="/lab4/" class="btn btn-outline">В меню</a>
+    </div>
+</div>
+{% endblock %}

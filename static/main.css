@@ -379,3 +379,114 @@ input[type="checkbox"] {
         color: darkblue;
         font-weight: bold;
     }
+
+    .users-page .users-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 30px 40px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.users-page h1 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+.users-page table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.users-page th {
+    background-color: #2e7d32;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+}
+
+.users-page td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-page tr:hover {
+    background-color: #f1f8e9;
+    transition: 0.2s;
+}
+
+.users-page tr.current-user {
+    background-color: #e8f5e9;
+    font-weight: bold;
+}
+
+.users-page .user-info {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.users-page .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.users-page .btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.users-page .btn-green {
+    background-color: #43a047;
+    color: white;
+}
+
+.users-page .btn-green:hover {
+    background-color: #388e3c;
+}
+
+.users-page .btn-red {
+    background-color: #e53935;
+    color: white;
+}
+
+.users-page .btn-red:hover {
+    background-color: #c62828;
+}
+
+.users-page .btn-gray {
+    background-color: #757575;
+    color: white;
+}
+
+.users-page .btn-gray:hover {
+    background-color: #616161;
+}
+
+.users-page .btn-outline {
+    background-color: transparent;
+    border: 2px solid #43a047;
+    color: #43a047;
+}
+
+.users-page .btn-outline:hover {
+    background-color: #43a047;
+    color: #fff;
+}
+
