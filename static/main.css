@@ -305,3 +305,77 @@ input[type="checkbox"] {
     font-size: 0.9em;
     margin-left: 5px;
 }
+
+
+.grain-container {
+        max-width: 480px;
+        margin: 40px auto;
+        padding: 25px 30px;
+        background: #f9f9f9;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .grain-container h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .grain-container label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .grain-container select,
+    .grain-container input {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+        margin-bottom: 15px;
+    }
+
+    .grain-container select:focus,
+    .grain-container input:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    .grain-container button {
+        width: 100%;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .grain-message {
+        margin-top: 15px;
+        font-weight: 600;
+        color: #004466;
+        text-align: center;
+    }
+
+    .grain-error {
+        margin-top: 15px;
+        font-weight: bold;
+        color: crimson;
+        text-align: center;
+    }
+
+    .discount {
+        text-align: center;
+        margin-top: 10px;
+        color: darkblue;
+        font-weight: bold;
+    }

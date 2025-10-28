@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block lab %}Заказ зерна{% endblock %}
+
+{% block main %}
+
+
+<div class="grain-container">
+    <h1>Заказ зерна</h1>
+
+    <form method="post">
+        <label for="grain">Выберите зерно:</label>
+        <select name="grain" id="grain">
+            <option value="" selected disabled hidden>-- выберите зерно --</option>
+            <option value="ячмень" {% if grain == 'ячмень' %}selected{% endif %}>Ячмень</option>
+            <option value="овёс" {% if grain == 'овёс' %}selected{% endif %}>Овёс</option>
+            <option value="пшеница" {% if grain == 'пшеница' %}selected{% endif %}>Пшеница</option>
+            <option value="рожь" {% if grain == 'рожь' %}selected{% endif %}>Рожь</option>
+        </select>
+
+        <label for="weight">Вес (тонн):</label>
+        <input type="number" step="0.01" name="weight" id="weight" placeholder="Введите количество тонн"
+               value="{{ weight if weight }}">
+
+        <button type="submit">Сформировать заказ</button>
+    </form>
+
+    {% if error %}
+        <div class="grain-error">{{ error }}</div>
+    {% endif %}
+
+    {% if message %}
+        <div class="grain-message">{{ message }}</div>
+    {% endif %}
+
+    {% if discount_text %}
+        <div class="discount">{{ discount_text }}</div>
+    {% endif %}
+
+    <a href="/lab4/" class="back-link">⬅ Вернуться в меню</a>
+</div>
+{% endblock %}
