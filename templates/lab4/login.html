@@ -1,35 +1,39 @@
 {% extends "base.html" %}
 
-{# номер лабораторной работы: #}
-{% block lab %}Лабораторная работа 4{% endblock %}
+{% block lab %}Авторизация{% endblock %}
 
-{# основной контент: #}
 {% block main %}
     {% if authorized %}
-        <h1>Добро пожаловать, {{ login }}</h1>
-        <div>
-            <form action="/lab4/logout" method="post">
-                <button>Выход</button>
-            </form>
-        </div>
+        <h1>Добро пожаловать, {{ name }}!</h1>
+        <form action="/lab4/logout" method="post">
+            <button>Выйти</button>
+        </form>
     {% else %}
         <h1>Вход</h1>
-        <h2>Пожалуйста, авторизируйтесь</h2>
+        <h2>Пожалуйста, авторизуйтесь</h2>
+
         <form method="post">
             <div>
-                <lable for="login">Пользователь:</lable>
-                <input type="text" id="login" name="login">
+                <label for="login">Пользователь:</label>
+                <input type="text" id="login" name="login" value="{{ login }}">
             </div>
             <div>
                 <label for="password">Пароль:</label>
                 <input type="password" id="password" name="password">
             </div>
-            <div>{{ error }}</div>
-            <div>
+
+            {% if error %}
+            <div style="color: crimson; font-weight: bold; margin-top: 10px; font-size: 1.1em;">
+                ⚠ {{ error }}
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 15px;">
                 <button type="submit">Войти</button>
                 <button type="reset">Отмена</button>
             </div>
         </form>
     {% endif %}
-<a href="/lab4/">В меню</a>
+
+    <a href="/lab4/">В меню</a>
 {% endblock %}
