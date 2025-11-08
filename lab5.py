@@ -84,12 +84,37 @@ def register():
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
 
+    
+@lab5.route('/lab5/create', methods = ['POST', 'GET'])
+def create():
+    login=session.get('login')
+    if not login:
+        return redirect('lab5/login')
+    
+    if request.method == 'GET':
+        return render_template('lab5/create_article.html', login=login)
+    
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
+
+    conn, cur = db_connect()
+
+    cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+    user = cur.fetchone()
+
+    if not user:
+        db_close(conn, cur)
+        return render_template('lab5/create_article.html', error='Пользователь не найден!')
+
+    user_id = user['id']
+    cur.execute(
+        "INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
+        (user_id, title, article_text)
+    )
+    db_close(conn, cur)
+    return redirect('/lab5/')
+
 
 @lab5.route('/lab5/list')
 def list():
     return render_template('lab5/list.html')
-
-    
-@lab5.route('/lab5/create')
-def create():
-    return render_template('lab5/create.html')
