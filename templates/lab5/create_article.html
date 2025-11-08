@@ -7,17 +7,24 @@
 
 <form action="" method="post">
     <div>
-        <label>Тема: <input type="text" name="title" value="{{ article['title'] if edit else '' }}"></label>
+        <label>Тема: <input type="text" name="title" value="{{ article['title'] if article else '' }}" required></label>
     </div>
     <div>
-        <label>Текст статьи: <textarea name="article_text">{{ article['article_text'] if edit else '' }}</textarea></label>
+        <label>Текст статьи:</label><br>
+        <textarea name="article_text" required>{{ article['article_text'] if article else '' }}</textarea>
     </div>
+
+    <div>
+        <label><input type="checkbox" name="is_favorite" {% if article and article['is_favorite'] %}checked{% endif %}> Любимая</label><br>
+        <label><input type="checkbox" name="is_public" {% if article and article['is_public'] %}checked{% endif %}> Публичная</label>
+    </div>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
     <button type="submit">{% if edit %}Сохранить{% else %}Создать{% endif %}</button>
 </form>
-
-{% if error %}
-    <p style="color:red;">⚠ {{ error }}</p>
-{% endif %}
 
 <a href="{{ url_for('lab5.list') }}">Назад к списку статей</a>
 <a href="/lab5/">В меню</a>

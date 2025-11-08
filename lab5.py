@@ -85,8 +85,9 @@ def register():
     
     login = request.form.get('login')
     password = request.form.get('password')
+    real_name = request.form.get('real_name')
 
-    if not (login or password):
+    if not (login and password and real_name):
         return render_template('lab5/register.html', error='Заполните все поля!')
 
     conn, cur = db_connect()
@@ -103,9 +104,9 @@ def register():
     
     password_hash = generate_password_hash(password)
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password_hash))
+        cur.execute("INSERT INTO users (login, password, real_name) VALUES (%s, %s, %s);", (login, password_hash, real_name))
     else:
-        cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, password_hash))
+        cur.execute("INSERT INTO users (login, password, real_name) VALUES (?, ?, ?);", (login, password_hash, real_name))
     conn.commit() 
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
@@ -122,6 +123,8 @@ def create():
 
     title = request.form.get('title', '').strip()
     article_text = request.form.get('article_text', '').strip()
+    is_favorite = request.form.get('is_favorite') == 'on'
+    is_public = request.form.get('is_public') == 'on'
 
     if not title or not article_text:
         return render_template(
@@ -148,13 +151,13 @@ def create():
 
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute(
-            "INSERT INTO articles (user_id, title, article_text) VALUES (%s, %s, %s);",
-            (user_id, title, article_text)
+            "INSERT INTO articles (user_id, title, article_text, is_favorite, is_public) VALUES (%s, %s, %s, %s, %s);",
+            (user_id, title, article_text, is_favorite, is_public)
         )
     else:
         cur.execute(
-            "INSERT INTO articles (user_id, title, article_text) VALUES (?, ?, ?);",
-            (user_id, title, article_text)
+             "INSERT INTO articles (user_id, title, article_text, is_favorite, is_public) VALUES (?, ?, ?, ?, ?);",
+            (user_id, title, article_text, is_favorite, is_public)
         )
 
     db_close(conn, cur)
@@ -164,37 +167,58 @@ def create():
 @lab5.route('/lab5/list')
 def list():
     login = session.get('login')
-    if not login:
-        return redirect('/lab5/login')
-    
     conn, cur = db_connect()
 
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+    if login:
+        # получаем id текущего пользователя
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        else:
+            cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
+        user = cur.fetchone()
+        user_id = user['id'] if user else None
+
+        # выбираем свои статьи + публичные других пользователей
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("""
+                SELECT a.*, u.login, u.real_name
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.user_id = %s OR a.is_public = true
+                ORDER BY a.is_favorite DESC, a.id;
+            """, (user_id,))
+        else:
+            cur.execute("""
+                SELECT a.*, u.login, u.real_name
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.user_id = ? OR a.is_public = 1
+                ORDER BY a.is_favorite DESC, a.id;
+            """, (user_id,))
     else:
-        cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
-    user = cur.fetchone()
+        # если пользователь не авторизован — показываем только публичные статьи
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("""
+                SELECT a.*, u.login, u.real_name
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.is_public = true
+                ORDER BY a.is_favorite DESC, a.id;
+            """)
+        else:
+            cur.execute("""
+                SELECT a.*, u.login, u.real_name
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.is_public = 1
+                ORDER BY a.is_favorite DESC, a.id;
+            """)
 
-    if not user:
-        db_close(conn, cur)
-        return render_template('lab5/articles.html', articles=[], error="Пользователь не найден")
-
-    user_id = user['id']
-
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT * FROM articles WHERE user_id = %s;", (user_id,))
-    else:
-        cur.execute("SELECT * FROM articles WHERE user_id = ?;", (user_id,))
     articles = cur.fetchall()
-
     db_close(conn, cur)
-    
-    if not articles:
-        message = "У вас пока нет ни одной статьи"
-    else:
-        message = None
 
-    return render_template('lab5/articles.html', articles=articles, message=message)
+    return render_template('lab5/articles.html', articles=articles, login=login)
+
 
 
 @lab5.route('/lab5/edit/<int:article_id>', methods=['GET','POST'])
@@ -242,3 +266,71 @@ def delete(article_id):
     db_close(conn, cur)
     flash("Статья удалена", "success")
     return redirect(url_for('lab5.list'))
+
+
+@lab5.route('/lab5/users')
+def users():
+    conn, cur = db_connect()
+    cur.execute("SELECT login, real_name FROM users;")
+    users = cur.fetchall()
+    db_close(conn, cur)
+    return render_template('lab5/users.html', users=users)
+
+
+@lab5.route('/lab5/profile', methods = ['GET', 'POST'])
+def profile():
+    login = session.get('login')
+    if not login:
+        return redirect(url_for('lab5.login'))
+    
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM users WHERE login = %s;", (login, ))
+    else:
+        cur.execute("SELECT * FROM users WHERE login = ?;", (login, ))
+    user = cur.fetchone()
+
+    if request.method == 'POST':
+        real_name = request.form.get('real_name').strip()
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('confirm')
+
+        if not real_name:
+            db_close(conn, cur)
+            return render_template('lab5/profile.html', user=user, error="Имя не может быть пустым!")
+
+        if new_password:
+            if new_password != confirm_password:
+                db_close(conn, cur)
+                return render_template('lab5/profile.html', user=user, error="Пароли не совпадают!")
+            password_hash = generate_password_hash(new_password)
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("UPDATE users SET real_name=%s, password=%s WHERE login=%s;", (real_name, password_hash, login))
+            else:
+                cur.execute("UPDATE users SET real_name=?, password=? WHERE login=?;", (real_name, password_hash, login))
+        else:
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("UPDATE users SET real_name=%s WHERE login=%s;", (real_name, login))
+            else:
+                cur.execute("UPDATE users SET real_name=? WHERE login=?;", (real_name, login))
+
+        db_close(conn, cur)
+        return render_template('lab5/profile.html', user=user, message="Изменения сохранены!")
+
+    db_close(conn, cur)
+    return render_template('lab5/profile.html', user=user)
+
+
+@lab5.route('/lab5/public')
+def public_articles():
+    conn, cur = db_connect()
+    cur.execute("""
+        SELECT a.title, a.article_text, u.login, u.real_name
+        FROM articles a
+        JOIN users u ON a.user_id = u.id
+        WHERE a.is_public = true
+        ORDER BY a.is_favorite DESC, a.id;
+    """)
+    articles = cur.fetchall()
+    db_close(conn, cur)
+    return render_template('lab5/public_articles.html', articles=articles)

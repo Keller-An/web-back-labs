@@ -8,6 +8,8 @@
     {% if login %}
         <a href="{{ url_for('lab5.list') }}">Список статей</a>
         <a href="{{ url_for('lab5.create') }}">Создать статью</a>
+        <a href="{{ url_for('lab5.users') }}">Список пользователей</a>
+        <a href="{{ url_for('lab5.profile') }}">Редактировать данные</a>
         <form action="{{ url_for('lab5.logout') }}" method="get" style="display:inline;">
             <button type="submit">Выйти</button>
         </form>
@@ -15,6 +17,7 @@
     {% else %}
         <a href="{{ url_for('lab5.login') }}">Войти</a>
         <a href="{{ url_for('lab5.register') }}">Регистрация</a>
+        <a href="{{ url_for('lab5.list') }}">Список статей</a>
     {% endif %}
 </div>
 

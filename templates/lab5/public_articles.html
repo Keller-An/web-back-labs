@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block lab %}Публичные статьи{% endblock %}
+
+{% block main %}
+<h1>Публичные статьи</h1>
+
+{% for a in articles %}
+<div style="border:1px solid #ccc; padding:10px; margin:10px;">
+    <h2>{{ a['title'] }}</h2>
+    <blockquote>{{ a['article_text'] }}</blockquote>
+    <p><i>Автор: {{ a['real_name'] or a['login'] }}</i></p>
+</div>
+{% else %}
+<p>Нет публичных статей.</p>
+{% endfor %}
+{% endblock %}
