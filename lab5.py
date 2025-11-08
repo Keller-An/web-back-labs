@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request, session, current_app
+from flask import Blueprint, render_template, redirect, request, session, current_app, url_for,  flash
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -70,6 +70,14 @@ def login():
     return render_template('lab5/success_login.html', login=login)
 
 
+@lab5.route('/lab5/logout')
+def logout():
+    session.pop('login', None)
+    flash("Вы вышли из системы", "success")
+    return redirect(url_for('lab5.lab'))
+
+
+
 @lab5.route('/lab5/register', methods = ['GET', 'POST'])
 def register():
     if request.method == 'GET':
@@ -111,16 +119,25 @@ def create():
     
     if request.method == 'GET':
         return render_template('lab5/create_article.html', login=login)
-    
-    title = request.form.get('title')
-    article_text = request.form.get('article_text')
 
+    title = request.form.get('title', '').strip()
+    article_text = request.form.get('article_text', '').strip()
+
+    if not title or not article_text:
+        return render_template(
+            'lab5/create_article.html',
+            login=login,
+            edit=False,
+            article={'title': title, 'article_text': article_text},
+            error="Тема и текст статьи не могут быть пустыми!"
+        )
+    
     conn, cur = db_connect()
 
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
     else:
-        cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
+        cur.execute("SELECT id FROM users WHERE login=?;", (login, ))
     user = cur.fetchone()
 
     if not user:
@@ -171,4 +188,57 @@ def list():
     articles = cur.fetchall()
 
     db_close(conn, cur)
-    return render_template('lab5/articles.html', articles=articles)
+    
+    if not articles:
+        message = "У вас пока нет ни одной статьи"
+    else:
+        message = None
+
+    return render_template('lab5/articles.html', articles=articles, message=message)
+
+
+@lab5.route('/lab5/edit/<int:article_id>', methods=['GET','POST'])
+def edit(article_id):
+    login_input = session.get('login')
+    if not login_input:
+        return redirect(url_for('lab5.login'))
+
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("SELECT * FROM articles WHERE id=%s;", (article_id,))
+    else:
+        cur.execute("SELECT * FROM articles WHERE id=?;", (article_id,))
+    article = cur.fetchone()
+
+    if request.method == 'POST':
+        title = request.form.get('title').strip()
+        text = request.form.get('article_text').strip()
+        if not title or not text:
+            flash("Тема и текст статьи не могут быть пустыми!", "error")
+            return redirect(url_for('lab5.edit', article_id=article_id))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("UPDATE articles SET title=%s, article_text=%s WHERE id=%s;", (title, text, article_id))
+        else:
+            cur.execute("UPDATE articles SET title=?, article_text=? WHERE id=?;", (title, text, article_id))
+        db_close(conn, cur)
+        flash("Статья обновлена", "success")
+        return redirect(url_for('lab5.list'))
+
+    db_close(conn, cur)
+    return render_template('lab5/create_article.html', article=article, login=login_input, edit=True)
+
+
+@lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
+def delete(article_id):
+    login_input = session.get('login')
+    if not login_input:
+        return redirect(url_for('lab5.login'))
+
+    conn, cur = db_connect()
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("DELETE FROM articles WHERE id=%s;", (article_id,))
+    else:
+        cur.execute("DELETE FROM articles WHERE id=?;", (article_id,))
+    db_close(conn, cur)
+    flash("Статья удалена", "success")
+    return redirect(url_for('lab5.list'))

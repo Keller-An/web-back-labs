@@ -3,22 +3,22 @@
 {% block lab %}Лабораторная работа 5{% endblock %}
 
 {% block main %}
-    <h1>Создание статьи</h1>
+<h1>{% if edit %}Редактировать{% else %}Создать{% endif %} статью</h1>
 
-    <form method="post">
-        <div>
-            <label>
-                Название статьи:
-                <input type="text" maxlength="50" name="title">
-            </label>
-        </div>
+<form action="" method="post">
+    <div>
+        <label>Тема: <input type="text" name="title" value="{{ article['title'] if edit else '' }}"></label>
+    </div>
+    <div>
+        <label>Текст статьи: <textarea name="article_text">{{ article['article_text'] if edit else '' }}</textarea></label>
+    </div>
+    <button type="submit">{% if edit %}Сохранить{% else %}Создать{% endif %}</button>
+</form>
 
-        <div>
-            <textarea name="article_text"></textarea>
-        </div>
+{% if error %}
+    <p style="color:red;">⚠ {{ error }}</p>
+{% endif %}
 
-        <div>
-            <button type="submit">Готово</button>
-        </div>
-    </form>
+<a href="{{ url_for('lab5.list') }}">Назад к списку статей</a>
+<a href="/lab5/">В меню</a>
 {% endblock %}

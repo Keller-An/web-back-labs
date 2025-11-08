@@ -4,9 +4,23 @@
 
 {% block main %}
     <h1>Статьи</h1>
-    
+
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
     {% for article in articles %}
-        <h2>{{ article['title'] }}</h2>
-        <blockquote>{{ article['article_text'] }}</blockquote>
+        <div class="article">
+            <h2>{{ article['title'] }}</h2>
+            <blockquote>{{ article['article_text'] }}</blockquote>
+            
+            <a href="{{ url_for('lab5.edit', article_id=article['id']) }}">Редактировать</a>
+            
+            <form action="{{ url_for('lab5.delete', article_id=article['id']) }}" method="post" style="display:inline;">
+                <button type="submit">Удалить</button>
+            </form>
+        </div>
+<a href="/lab5/">В меню</a>
+        <hr>
     {% endfor %}
 {% endblock %}
