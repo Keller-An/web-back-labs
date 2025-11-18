@@ -111,7 +111,8 @@ def register():
     db_close(conn, cur)
     return render_template('lab5/success.html', login=login)
 
-    
+
+
 @lab5.route('/lab5/create', methods = ['POST', 'GET'])
 def create():
     login=session.get('login')
@@ -169,16 +170,28 @@ def list():
     login = session.get('login')
     conn, cur = db_connect()
 
-    if login:
-        # получаем id текущего пользователя
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
-        else:
-            cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
-        user = cur.fetchone()
-        user_id = user['id'] if user else None
+    user_id = None
+    own_count = 0
 
-        # выбираем свои статьи + публичные других пользователей
+    if login:
+        # получить id пользователя
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT id FROM users WHERE login=%s;", (login,))
+        else:
+            cur.execute("SELECT id FROM users WHERE login=?;", (login,))
+        user = cur.fetchone()
+        user_id = user['id']
+
+        # считаем количество СВОИХ статей
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT COUNT(*) AS cnt FROM articles WHERE user_id=%s;", (user_id,))
+        else:
+            cur.execute("SELECT COUNT(*) AS cnt FROM articles WHERE user_id=?;", (user_id,))
+
+        row = cur.fetchone()
+        own_count = row['cnt'] if row else 0
+
+        # получаем свои + публичные
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("""
                 SELECT a.*, u.login, u.real_name
@@ -196,7 +209,7 @@ def list():
                 ORDER BY a.is_favorite DESC, a.id;
             """, (user_id,))
     else:
-        # если пользователь не авторизован — показываем только публичные статьи
+        # не авторизован — только публичные
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("""
                 SELECT a.*, u.login, u.real_name
@@ -217,7 +230,8 @@ def list():
     articles = cur.fetchall()
     db_close(conn, cur)
 
-    return render_template('lab5/articles.html', articles=articles, login=login)
+    return render_template('lab5/articles.html', articles=articles, login=login, own_count=own_count)
+
 
 
 

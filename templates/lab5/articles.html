@@ -8,6 +8,10 @@
     {% if message %}
         <p>{{ message }}</p>
     {% endif %}
+    
+    {% if login and own_count == 0 %}
+    <p class="info">У вас ещё нет собственных статей.</p>
+    {% endif %}
 
     {% for article in articles %}
         <div class="article">

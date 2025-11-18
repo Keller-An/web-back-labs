@@ -19,9 +19,7 @@
         <label><input type="checkbox" name="is_public" {% if article and article['is_public'] %}checked{% endif %}> Публичная</label>
     </div>
 
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
+   
 
     <button type="submit">{% if edit %}Сохранить{% else %}Создать{% endif %}</button>
 </form>
