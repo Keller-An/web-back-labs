@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
     <title>Список статей</title>
-</head>
-<body>
+
     <h1>Список статей</h1>
     
     {% if login %}
@@ -61,5 +61,4 @@
     </div>
 
     <p><a href="{{ url_for('lab5.lab') }}">Назад к лабораторной работе 5</a></p>
-</body>
-</html>
+{% endblock %}
