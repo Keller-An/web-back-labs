@@ -19,7 +19,14 @@
         <label><input type="checkbox" name="is_public" {% if article and article['is_public'] %}checked{% endif %}> Публичная</label>
     </div>
 
-   
+    
+    {% if edit and article %}
+    <div style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+        <strong>Текущий статус статьи:</strong>
+        {% if article.is_favorite %} ★ Любимая {% endif %}
+        {% if article.is_public %} 🌐 Публичная {% endif %}
+    </div>
+    {% endif %}
 
     <button type="submit">{% if edit %}Сохранить{% else %}Создать{% endif %}</button>
 </form>
