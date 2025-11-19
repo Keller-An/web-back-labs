@@ -520,3 +520,78 @@ input[type="checkbox"] {
     font-weight: bold;
     color: #333;
 }
+
+
+.article {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+}
+.favorite {
+    border-left: 4px solid #ffd700;
+    background-color: #fffde7;
+}
+.public {
+    border-right: 4px solid #4caf50;
+}
+.badges {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    margin-left: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.badge-favorite {
+    background-color: #ffd700;
+    color: #333;
+}
+.badge-public {
+    background-color: #4caf50;
+    color: white;
+}
+.badge-own {
+    background-color: #2196f3;
+    color: white;
+}
+.article-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+.article-title {
+    margin: 0;
+    flex-grow: 1;
+}
+.article-meta {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.actions {
+    margin-top: 10px;
+}
+.btn {
+    padding: 5px 10px;
+    margin-right: 5px;
+    text-decoration: none;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+}
+.btn-edit {
+    background-color: #ffc107;
+    color: black;
+}
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+}

@@ -1,17 +1,55 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Публичные статьи</title>
+    <style>
+        .article {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .favorite {
+            border-left: 4px solid #ffd700;
+            background-color: #fffde7;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            margin-left: 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-favorite {
+            background-color: #ffd700;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Публичные статьи</h1>
 
-{% block lab %}Публичные статьи{% endblock %}
+    <div class="articles-list">
+        {% for article in articles %}
+            <div class="article {% if article.is_favorite %}favorite{% endif %}">
+                <h3>
+                    {{ article.title }}
+                    {% if article.is_favorite %}
+                        <span class="badge badge-favorite">Любимая ★</span>
+                    {% endif %}
+                </h3>
+                <p><strong>Автор:</strong> {{ article.real_name }} ({{ article.login }})</p>
+                <div class="article-text">
+                    {{ article.article_text | replace('\n', '<br>') | safe }}
+                </div>
+            </div>
+        {% else %}
+            <p>Публичные статьи не найдены.</p>
+        {% endfor %}
+    </div>
 
-{% block main %}
-<h1>Публичные статьи</h1>
-
-{% for a in articles %}
-<div style="border:1px solid #ccc; padding:10px; margin:10px;">
-    <h2>{{ a['title'] }}</h2>
-    <blockquote>{{ a['article_text'] }}</blockquote>
-    <p><i>Автор: {{ a['real_name'] or a['login'] }}</i></p>
-</div>
-{% else %}
-<p>Нет публичных статей.</p>
-{% endfor %}
-{% endblock %}
+    <p><a href="{{ url_for('lab5.lab') }}">Назад к лабораторной работе 5</a></p>
+</body>
+</html>

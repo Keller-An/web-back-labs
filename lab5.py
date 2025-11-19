@@ -230,7 +230,7 @@ def list():
     articles = cur.fetchall()
     db_close(conn, cur)
 
-    return render_template('lab5/articles.html', articles=articles, login=login, own_count=own_count)
+    return render_template('lab5/articles.html', articles=articles, login=login, own_count=own_count, user_id=user_id)
 
 
 
