@@ -23,23 +23,42 @@ function getOfficeList() {
         const office_list = data.result;
         const ul = document.getElementById('office-list');
         ul.innerHTML = '';
+        let totalCost = 0; 
+
         for(let i = 0; i < office_list.length; i++) {
             const office = office_list[i];
             const li = document.createElement('li');
-            li.innerText = `${office.number}: ${office.tenant || 'свободен'}`;
+            li.className = 'office-item';
+            li.innerText = `Офис ${office.number}: ${office.tenant || 'свободен'} - ${office.price} руб./мес.`;
 
             const bookingButton = document.createElement('button');
-            bookingButton.innerText = 'зарезервивровать';
+             bookingButton.className = 'book-btn';
+            bookingButton.innerText = 'зарезервировать';
             bookingButton.onclick = function() {booking(office.number)};
             li.appendChild(bookingButton);
             
             const freeButton = document.createElement('button');
+            freeButton.className = 'free-btn';
             freeButton.innerText = 'освободить';
             freeButton.onclick = function() {cancelBooking(office.number)};
             li.appendChild(freeButton);
 
             ul.appendChild(li);
+
+            if (office.tenant) {
+                totalCost += office.price;
+            }
         }
+
+
+        let totalDiv = document.getElementById('total-cost');
+        if(!totalDiv) {
+            totalDiv = document.createElement('div');
+            totalDiv.id = 'total-cost';
+            totalDiv.className = 'total-cost';
+            document.getElementById('office-list').parentNode.appendChild(totalDiv);
+        }
+        totalDiv.innerHTML = `<h2>Общая стоимость аренды: ${totalCost} руб./мес.</h2>`;
     });
 }
 
@@ -129,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endblock %}
 
 {% block main %}
-    <h1>Список кабинетов</h1>
-    <ul id="office-list"></ul>
-
+    <h1 class="page-title">Список кабинетов</h1>
+    <ul id="office-list" class="office-list"></ul>
 {% endblock %}
