@@ -158,7 +158,7 @@ def index():
               <li><a href="/lab3/">Лабораторная 3</a></li>
               <li><a href="/lab4/">Лабораторная 4</a></li>
               <li><a href="/lab5/">Лабораторная 5</a></li>
-              <li><a href="/lab6/">Лабораторная 6</a></li>
+              <li><a href="/lab6">Лабораторная 6</a></li>
         </nav>
 
         <footer>

@@ -24,6 +24,7 @@
                 {% endif %}
             }
         </style>
+        {% block script %}{% endblock %}
     </head>
     <body>
         <header>
@@ -36,6 +37,7 @@
         <a href="{{ url_for('lab2.lab2_index') }}">Лабораторная 2</a>
         <a href="{{ url_for('lab3.lab') }}">Лабораторная 3</a>
         <a href="{{ url_for('lab4.lab') }}">Лабораторная 4</a>
+        <a href="{{ url_for('lab5.lab') }}">Лабораторная 5</a>
         </nav>
         
         <main>
