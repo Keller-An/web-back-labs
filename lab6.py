@@ -46,11 +46,11 @@ def api():
     if data['method'] == 'info':
 
         conn, cur = db_connect()
+        cur.execute("SELECT * FROM offices ORDER BY number;")
         if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM offices ORDER BY number;")
+            offices = cur.fetchall() 
         else:
-             cur.execute("SELECT * FROM offices ORDER BY number;")
-        offices = cur.fetchall()
+            offices = [dict(row) for row in cur.fetchall()]
         db_close(conn, cur)
     
         return {
@@ -79,6 +79,8 @@ def api():
         else:
             cur.execute("SELECT tenant FROM offices WHERE number=?;", (office_number,))
         row = cur.fetchone()
+        if row:
+            row = dict(row)
 
         if not row:
             db_close(conn, cur)
@@ -108,6 +110,8 @@ def api():
         else:
              cur.execute("UPDATE offices SET tenant=? WHERE number=?;", ('', office_number))
         row = cur.fetchone()
+        if row:
+            row = dict(row)
 
         if not row:
             db_close(conn, cur)
