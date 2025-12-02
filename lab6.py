@@ -1,10 +1,37 @@
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from flask import current_app
+from os import path
+import sqlite3
 from flask import Blueprint, render_template, request, session
 
 lab6 = Blueprint('lab6', __name__)
 
-offices =[]
-for i in range(1, 11):
-    offices.append({"number": i, "tenant": "", "price": 1000 + i + 100})
+
+def db_connect():
+    if current_app.config['DB_TYPE'] == 'postgres':
+        conn = psycopg2.connect(
+            host='127.0.0.1',
+            database='anastasia_maxmadbekova_knowledge_base',
+            user='anastasia_maxmadbekova_knowledge_base',
+            password='weblabs'
+        )
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+    else:
+        dir_path = path.dirname(path.realpath(__file__))
+        db_path = path.join(dir_path, "database.db")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+    return conn, cur
+
+
+def db_close(conn, cur):
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 
 @lab6.route('/lab6')
@@ -17,10 +44,15 @@ def api():
     data = request.json
     id = data['id']
     if data['method'] == 'info':
+        conn, cur = db_connect()
+        cur.execute("SELECT * FROM offices ORDER BY number;")
+        offices = cur.fetchall()
+        db_close(conn, cur)
+    
         return {
             'jsonrpc': '2.0',
             'result': offices,
-            'id': id, 
+            'id': id
         }
     
     login = session.get('login')
@@ -36,60 +68,49 @@ def api():
 
     if data['method'] == 'booking':
         office_number = data['params']
-        for office in offices:
-            if office['number'] == office_number:
-                if office['tenant'] != '':
-                    return {
-                        'jsonrpc': '2.0',
-                        'error': {
-                            'code': 2,
-                            'message': 'Already booked'
-                        },
-                        'id': id
-                    }
 
-                office['tenant'] = login
-                return {
-                    'jsonrpc': '2.0',
-                    'result': 'success',
-                    'id': id
-                }
+        conn, cur = db_connect()
+
+        cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        row = cur.fetchone()
+
+        if not row:
+            db_close(conn, cur)
+            return {'jsonrpc':'2.0','error':{'code':5,'message':'Office not found'},'id':id}
+
+        if row['tenant'] != '':
+            db_close(conn, cur)
+            return {'jsonrpc':'2.0','error':{'code':2,'message':'Already booked'},'id':id}
+
+        # Бронируем
+        cur.execute("UPDATE offices SET tenant=%s WHERE number=%s;", (login, office_number))
+        db_close(conn, cur)
+
+        return {'jsonrpc':'2.0','result':'success','id':id}
+
             
     if data['method'] == 'cancellation':
         office_number = data['params']
-        for office in offices:
-            if office['number'] == office_number:
-                if office['tenant'] == '':
-                    return {
-                        'jsonrpc': '2.0',
-                        'error': {
-                            'code': 3,
-                            'message': 'Office is not booked'
-                        },
-                        'id': id
-                    }
-                if office['tenant'] != login:
-                    return {
-                        'jsonrpc': '2.0',
-                        'error': {
-                            'code': 4,
-                            'message': 'Not your booking'
-                        },
-                        'id': id
-                    }
 
-                office['tenant'] = ''
-                return {
-                    'jsonrpc': '2.0',
-                    'result': 'success',
-                    'id': id
-                } 
+        conn, cur = db_connect()
 
-    return {
-        'jsonrpc': '2.0',
-        'error': {
-            'code': -32601,
-            'message': 'Method not found'
-        },
-        'id': id
-    }
+        cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        row = cur.fetchone()
+
+        if not row:
+            db_close(conn, cur)
+            return {'jsonrpc':'2.0','error':{'code':5,'message':'Office not found'},'id':id}
+
+        if row['tenant'] == '':
+            db_close(conn, cur)
+            return {'jsonrpc':'2.0','error':{'code':3,'message':'Office is not booked'},'id':id}
+
+        if row['tenant'] != login:
+            db_close(conn, cur)
+            return {'jsonrpc':'2.0','error':{'code':4,'message':'Not your booking'},'id':id}
+
+        # Отменяем бронь
+        cur.execute("UPDATE offices SET tenant='' WHERE number=%s;", (office_number,))
+        db_close(conn, cur)
+
+        return {'jsonrpc':'2.0','result':'success','id':id}
