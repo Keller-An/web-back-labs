@@ -44,8 +44,12 @@ def api():
     data = request.json
     id = data['id']
     if data['method'] == 'info':
+
         conn, cur = db_connect()
-        cur.execute("SELECT * FROM offices ORDER BY number;")
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM offices ORDER BY number;")
+        else:
+             cur.execute("SELECT * FROM offices ORDER BY number;")
         offices = cur.fetchall()
         db_close(conn, cur)
     
@@ -70,8 +74,10 @@ def api():
         office_number = data['params']
 
         conn, cur = db_connect()
-
-        cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        else:
+            cur.execute("SELECT tenant FROM offices WHERE number=?;", (office_number,))
         row = cur.fetchone()
 
         if not row:
@@ -83,7 +89,10 @@ def api():
             return {'jsonrpc':'2.0','error':{'code':2,'message':'Already booked'},'id':id}
 
         # Бронируем
-        cur.execute("UPDATE offices SET tenant=%s WHERE number=%s;", (login, office_number))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("UPDATE offices SET tenant=%s WHERE number=%s;", (login, office_number))
+        else:
+            cur.execute("UPDATE offices SET tenant=? WHERE number=?;", (login, office_number))
         db_close(conn, cur)
 
         return {'jsonrpc':'2.0','result':'success','id':id}
@@ -94,7 +103,10 @@ def api():
 
         conn, cur = db_connect()
 
-        cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
+        else:
+             cur.execute("UPDATE offices SET tenant=? WHERE number=?;", ('', office_number))
         row = cur.fetchone()
 
         if not row:
