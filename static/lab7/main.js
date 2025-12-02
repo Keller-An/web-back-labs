@@ -54,16 +54,24 @@ function deleteFilm(id, title) {
     })
 }
 
+
 function showModal() {
+    const errorDiv = document.getElementById('description-error');
+    if (errorDiv) errorDiv.innerText = '';
+    
     document.querySelector('div.modal').style.display = 'block';
 }
+
+
 function hideModal() {
     document.querySelector('div.modal').style.display = 'none';
 }
 
+
 function cancel() {
     hideModal();
 } 
+
 
 function addFilm() {
     document.getElementById('id').value = '';
@@ -73,6 +81,7 @@ function addFilm() {
     document.getElementById('description').value = '';
     showModal();
 }
+
 
 function sendFilm() {
         const id = document.getElementById('id').value;
@@ -91,9 +100,18 @@ function sendFilm() {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(film)
     })
-    .then(function() {
+     .then(resp => {
+        if (!resp.ok) return resp.json().then(err => {throw err});
+        return {};
+    })
+    .then(() => {
         fillFilmList();
         hideModal();
+        document.getElementById('description-error').innerText = '';
+    })
+    .catch(err => {
+        if (err.description)
+            document.getElementById('description-error').innerText = err.description;
     });
 }
 
