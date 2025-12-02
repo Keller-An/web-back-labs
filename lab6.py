@@ -3,7 +3,7 @@ from psycopg2.extras import RealDictCursor
 from flask import current_app
 from os import path
 import sqlite3
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, url_for
 
 lab6 = Blueprint('lab6', __name__)
 
