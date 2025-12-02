@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, request, abort, jsonify
 
 lab7 = Blueprint('lab7', __name__)
 
@@ -80,6 +80,10 @@ def put_film(id):
     film = request.get_json()
     if film['description'] == '':
         return {'description': 'Заполните описание!'}, 400
+    
+    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
+        film['titile'] = film['title_ru']
+
     films[id] = film
     return films[id]
 
@@ -89,5 +93,9 @@ def add_film():
     film = request.get_json()
     if not film.get('description', '').strip():
         return{'description': 'Заполните описание'}, 400
+    
+    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
+        film['title'] = film['title_ru']
+        
     films.append(film)
     return{"id": len(films) - 1}
