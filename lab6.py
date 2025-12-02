@@ -108,7 +108,7 @@ def api():
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("SELECT tenant FROM offices WHERE number=%s;", (office_number,))
         else:
-             cur.execute("UPDATE offices SET tenant=? WHERE number=?;", ('', office_number))
+            cur.execute("SELECT tenant FROM offices WHERE number=?;", (office_number,))
         row = cur.fetchone()
         if row:
             row = dict(row)
@@ -125,8 +125,20 @@ def api():
             db_close(conn, cur)
             return {'jsonrpc':'2.0','error':{'code':4,'message':'Not your booking'},'id':id}
 
-        # Отменяем бронь
-        cur.execute("UPDATE offices SET tenant='' WHERE number=%s;", (office_number,))
-        db_close(conn, cur)
+       # Отменяем бронь
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("UPDATE offices SET tenant=%s WHERE number=%s;", ('', office_number))
+        else:
+            cur.execute("UPDATE offices SET tenant=? WHERE number=?;", ('', office_number))
 
-        return {'jsonrpc':'2.0','result':'success','id':id}
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM offices WHERE number=%s;", (office_number,))
+            office = cur.fetchone()
+        else:
+            cur.execute("SELECT * FROM offices WHERE number=?;", (office_number,))
+            office = cur.fetchone()
+            if office:
+                office = dict(office)
+
+        db_close(conn, cur)
+        return {'jsonrpc':'2.0','result': office, 'id':id}
