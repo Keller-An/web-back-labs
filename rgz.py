@@ -264,6 +264,8 @@ def login():
     if not user or not check_password_hash(user['password_hash'], password):
         return render_template('rgz/login.html', error='Неверный логин или пароль')
 
+    user = dict(user)
+    
     session['login'] = user['login']
     session['user_id'] = user['id']
     session['is_admin'] = user.get('is_admin', False)
