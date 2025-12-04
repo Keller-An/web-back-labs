@@ -50,7 +50,7 @@ def validate_latin_chars(text):
 def main():
     conn, cur = db_connect()
     try:
-        cur.execute("SELECT * FROM rgz_cinema_movies ORDER BY created_at DESC")
+        cur.execute("SELECT * FROM rgz_cinema_movies ORDER BY id DESC")
         movies = cur.fetchall()
     finally:
         db_close(conn, cur)
