@@ -183,11 +183,11 @@ def booking(session_id):
     
     login = session.get('login')
     return render_template('rgz/booking.html', 
-                         session=session_info, 
-                         booked_seats=booked_seats,
-                         user_seats=user_seats,
-                         is_past=is_past,
-                         login=login)
+                        session_info=session_info, 
+                        booked_seats=booked_seats,
+                        user_seats=user_seats,
+                        is_past=is_past,
+                        login=login)
 
 
 
@@ -265,7 +265,7 @@ def login():
         return render_template('rgz/login.html', error='Неверный логин или пароль')
 
     user = dict(user)
-    
+
     session['login'] = user['login']
     session['user_id'] = user['id']
     session['is_admin'] = user.get('is_admin', False)
