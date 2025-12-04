@@ -51,7 +51,8 @@ def main():
     conn, cur = db_connect()
     try:
         cur.execute("SELECT * FROM rgz_cinema_movies ORDER BY id DESC")
-        movies = cur.fetchall()
+        movies_rows = cur.fetchall()
+        movies = [dict(m) for m in movies_rows]
     finally:
         db_close(conn, cur)
     login = session.get('login')
@@ -68,7 +69,8 @@ def movie_sessions(movie_id):
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=%s", (movie_id,))
         else:
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=?", (movie_id,))
-        movie = cur.fetchone()
+        movie_row = cur.fetchone()
+        movie = dict(movie_row) if movie_row else None
         
         if not movie:
             return "Фильм не найден", 404
@@ -78,7 +80,8 @@ def movie_sessions(movie_id):
             cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=%s ORDER BY date, time", (movie_id,))
         else:
             cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=? ORDER BY date, time", (movie_id,))
-        sessions = cur.fetchall()
+        sessions_rows = cur.fetchall()
+        sessions = [dict(s) for s in sessions_rows]
     finally:
         db_close(conn, cur)
     
