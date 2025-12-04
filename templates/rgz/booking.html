@@ -15,7 +15,7 @@
 <div class="rgz-container">
     <div class="rgz-header">
         <h1>🎟️ Бронирование мест</h1>
-        <p><strong>{{ session_info.movie_title }}</strong> - {{ session.date }}</p>
+        <p><strong>{{ session.movie_title }}</strong> - {{ session.date }}</p>
         <a href="/rgz/movie/{{ session.movie_id }}" class="back-link">← Назад к сеансам</a>
     </div>
 
@@ -23,7 +23,7 @@
     <div class="session-info">
         <h2>Информация о сеансе</h2>
         <div class="info-grid">
-            <div class="info-item"><span class="label">Фильм:</span> <span class="value">{{ session_info.movie_title }}</span></div>
+            <div class="info-item"><span class="label">Фильм:</span> <span class="value">{{ session.movie_title }}</span></div>
             <div class="info-item"><span class="label">Дата:</span> <span class="value">{{ session.date }}</span></div>
             <div class="info-item"><span class="label">Длительность:</span> <span class="value">{{ session.duration }} минут</span></div>
             <div class="info-item"><span class="label">Цена за место:</span> <span class="value price">{{ session.price }} ₽</span></div>
