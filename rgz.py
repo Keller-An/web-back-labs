@@ -75,6 +75,17 @@ def movie_sessions(movie_id):
         if not movie_row:
             return "Фильм не найден", 404
         
+        for s in sessions:
+            sess_time = s['time']
+            if isinstance(sess_time, time):
+                time_str = sess_time.strftime("%H:%M:%S")
+            else:
+                time_str = str(sess_time)
+
+            dt_format = "%Y-%m-%d %H:%M:%S" if len(time_str.split(':')) == 3 else "%Y-%m-%d %H:%M"
+            session_datetime = datetime.strptime(f"{s['date']} {time_str}", dt_format)
+            s['is_past'] = session_datetime < datetime.now()
+
         movie = dict(movie_row)  # конвертируем Row в словарь
         
         # Получаем сеансы фильма

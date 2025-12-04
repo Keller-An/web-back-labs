@@ -72,7 +72,7 @@
                     </div>
 
                     <div class="session-actions">
-                        <a href="{% if not session.is_past %}/rgz/booking/{{ session.id }}{% else %}#{% endif %}" 
+                        <a href="{% if not session.is_past %}/rgz/booking/{{ session['id'] }}{% else %}#{% endif %}" 
                             class="book-btn {% if session.is_past %}disabled{% endif %}">
                             {% if session.is_past %}
                                 🔒 Сеанс завершён
@@ -80,6 +80,7 @@
                                 {% if login %}🎟️ Выбрать места{% else %}🔒 Войти для бронирования{% endif %}
                             {% endif %}
                         </a>
+
 
 
                         {% if session.get('is_admin') %}
