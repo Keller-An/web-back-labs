@@ -183,7 +183,7 @@ def booking(session_id):
     
     login = session.get('login')
     return render_template('rgz/booking.html', 
-                         session=session_info, 
+                         session_info=session_info, 
                          booked_seats=booked_seats,
                          user_seats=user_seats,
                          is_past=is_past,
