@@ -126,6 +126,9 @@ def booking(session_id):
                 WHERE s.id=?
             """, (session_id,))
         session_info = cur.fetchone()
+        if session_info:
+            session_info = dict(session_info)  # конвертируем в словарь
+
         
         if not session_info:
             return "Сеанс не найден", 404
