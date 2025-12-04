@@ -62,19 +62,29 @@ def main():
 # Страница сеансов фильма
 @rgz.route('/rgz/movie/<int:movie_id>')
 def movie_sessions(movie_id):
+    sessions = []  # Инициализация, чтобы точно существовала
     conn, cur = db_connect()
     try:
         # Получаем информацию о фильме
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=%s", (movie_id,))
-            movie_row = cur.fetchone()
         else:
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=?", (movie_id,))
-            movie_row = cur.fetchone()
-        
+        movie_row = cur.fetchone()
         if not movie_row:
             return "Фильм не найден", 404
         
+        movie = dict(movie_row)
+
+        # Получаем сеансы фильма
+        if current_app.config['DB_TYPE'] == 'postgres':
+            cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=%s ORDER BY date, time", (movie_id,))
+        else:
+            cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=? ORDER BY date, time", (movie_id,))
+        sessions_rows = cur.fetchall()
+        sessions = [dict(s) for s in sessions_rows]
+
+        # Добавляем поле is_past для каждого сеанса
         for s in sessions:
             sess_time = s['time']
             if isinstance(sess_time, time):
@@ -85,22 +95,13 @@ def movie_sessions(movie_id):
             dt_format = "%Y-%m-%d %H:%M:%S" if len(time_str.split(':')) == 3 else "%Y-%m-%d %H:%M"
             session_datetime = datetime.strptime(f"{s['date']} {time_str}", dt_format)
             s['is_past'] = session_datetime < datetime.now()
-
-        movie = dict(movie_row)  # конвертируем Row в словарь
-        
-        # Получаем сеансы фильма
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=%s ORDER BY date, time", (movie_id,))
-        else:
-            cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=? ORDER BY date, time", (movie_id,))
-        sessions_rows = cur.fetchall()
-        sessions = [dict(s) for s in sessions_rows]  # конвертируем Row в словарь
-    
+            
     finally:
         db_close(conn, cur)
     
     login = session.get('login')
     return render_template('rgz/movie.html', movie=movie, sessions=sessions, login=login)
+
 
 
 
