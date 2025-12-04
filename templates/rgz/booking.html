@@ -223,20 +223,13 @@
         }
 
         try {
-            // Бронируем каждое выбранное место отдельно
-            const promises = selectedSeats.map(seat => 
-                callApi('toggle_booking', { 
-                    session_id: sessionId, 
-                    seat_number: seat 
-                })
-            );
-            
-            const results = await Promise.all(promises);
-            
+            const result = await callApi('toggle_booking', { 
+                session_id: sessionId, 
+                seat_numbers: selectedSeats
+            });
 
-            const hasError = results.some(result => result.error);
-            if (hasError) {
-                alert('Данный сеанс уже прошел');
+            if (result.error) {
+                alert(result.error.message);
             } else {
                 alert('Места успешно забронированы!');
                 location.reload(); 

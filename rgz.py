@@ -326,11 +326,15 @@ def toggle_booking(params, request_id):
         return json_rpc_response(None, {"code": 1, "message": "Необходима авторизация"}, request_id)
 
     session_id = params.get('session_id')
-    seat_number = params.get('seat_number')
-    action_type = params.get('action_type', 'book')  # по умолчанию бронирование
+    seat_numbers = params.get('seat_numbers')  # <-- массив мест
+    action_type = params.get('action_type', 'book')
 
-    if not session_id or not seat_number:
+    if not session_id or not seat_numbers:
         return json_rpc_response(None, {"code": -32602, "message": "Invalid params"}, request_id)
+
+    # если пришло одно место, приводим к списку
+    if isinstance(seat_numbers, int):
+        seat_numbers = [seat_numbers]
 
     conn, cur = db_connect()
     try:
@@ -357,51 +361,54 @@ def toggle_booking(params, request_id):
         if session_dt < datetime.now():
             return json_rpc_response(None, {"code": 5, "message": "Нельзя изменять прошедший сеанс"}, request_id)
 
-        # Проверяем, занято ли место
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM rgz_cinema_bookings WHERE session_id=%s AND seat_number=%s", (session_id, seat_number))
-        else:
-            cur.execute("SELECT * FROM rgz_cinema_bookings WHERE session_id=? AND seat_number=?", (session_id, seat_number))
-        booking = cur.fetchone()
-
-        action = ""
-        if action_type == "book":
-            if booking:
-                if booking['user_id'] == user_id:
-                    action = "already_booked"
-                else:
-                    return json_rpc_response(None, {"code": 2, "message": "Место уже занято"}, request_id)
+        # перебираем все места
+        results = []
+        for seat_number in seat_numbers:
+            # Проверяем, занято ли место
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("SELECT * FROM rgz_cinema_bookings WHERE session_id=%s AND seat_number=%s", (session_id, seat_number))
             else:
-                # Проверяем лимит 5 мест
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    cur.execute("SELECT COUNT(*) FROM rgz_cinema_bookings WHERE session_id=%s AND user_id=%s", (session_id, user_id))
-                else:
-                    cur.execute("SELECT COUNT(*) FROM rgz_cinema_bookings WHERE session_id=? AND user_id=?", (session_id, user_id))
-                current_count = cur.fetchone()
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    current_count = current_count['count']
-                else:
-                    current_count = current_count[0]
-                if current_count >= 5:
-                    return json_rpc_response(None, {"code": 3, "message": "Нельзя выбрать больше 5 мест"}, request_id)
+                cur.execute("SELECT * FROM rgz_cinema_bookings WHERE session_id=? AND seat_number=?", (session_id, seat_number))
+            booking = cur.fetchone()
 
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    cur.execute("INSERT INTO rgz_cinema_bookings (user_id, session_id, seat_number) VALUES (%s, %s, %s)", (user_id, session_id, seat_number))
+            action = ""
+            if action_type == "book":
+                if booking:
+                    if booking['user_id'] == user_id:
+                        action = "already_booked"
+                    else:
+                        return json_rpc_response(None, {"code": 2, "message": f"Место {seat_number} уже занято"}, request_id)
                 else:
-                    cur.execute("INSERT INTO rgz_cinema_bookings (user_id, session_id, seat_number) VALUES (?, ?, ?)", (user_id, session_id, seat_number))
-                action = "booked"
+                    # проверка лимита 5 мест
+                    if current_app.config['DB_TYPE'] == 'postgres':
+                        cur.execute("SELECT COUNT(*) FROM rgz_cinema_bookings WHERE session_id=%s AND user_id=%s", (session_id, user_id))
+                        current_count = cur.fetchone()['count']
+                    else:
+                        cur.execute("SELECT COUNT(*) FROM rgz_cinema_bookings WHERE session_id=? AND user_id=?", (session_id, user_id))
+                        current_count = cur.fetchone()[0]
+                    if current_count >= 5:
+                        return json_rpc_response(None, {"code": 3, "message": "Нельзя выбрать больше 5 мест"}, request_id)
 
-        elif action_type == "cancel":
-            if booking and booking['user_id'] == user_id:
-                if current_app.config['DB_TYPE'] == 'postgres':
-                    cur.execute("DELETE FROM rgz_cinema_bookings WHERE session_id=%s AND seat_number=%s AND user_id=%s", (session_id, seat_number, user_id))
+                    # бронирование
+                    if current_app.config['DB_TYPE'] == 'postgres':
+                        cur.execute("INSERT INTO rgz_cinema_bookings (user_id, session_id, seat_number) VALUES (%s, %s, %s)", (user_id, session_id, seat_number))
+                    else:
+                        cur.execute("INSERT INTO rgz_cinema_bookings (user_id, session_id, seat_number) VALUES (?, ?, ?)", (user_id, session_id, seat_number))
+                    action = "booked"
+
+            elif action_type == "cancel":
+                if booking and booking['user_id'] == user_id:
+                    if current_app.config['DB_TYPE'] == 'postgres':
+                        cur.execute("DELETE FROM rgz_cinema_bookings WHERE session_id=%s AND seat_number=%s AND user_id=%s", (session_id, seat_number, user_id))
+                    else:
+                        cur.execute("DELETE FROM rgz_cinema_bookings WHERE session_id=? AND seat_number=? AND user_id=?", (session_id, seat_number, user_id))
+                    action = "cancelled"
                 else:
-                    cur.execute("DELETE FROM rgz_cinema_bookings WHERE session_id=? AND seat_number=? AND user_id=?", (session_id, seat_number, user_id))
-                action = "cancelled"
-            else:
-                action = "not_booked"
+                    action = "not_booked"
 
-        # Получаем обновленный список мест пользователя
+            results.append({"seat": seat_number, "action": action})
+
+        # обновленный список мест пользователя
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("SELECT seat_number FROM rgz_cinema_bookings WHERE session_id=%s AND user_id=%s", (session_id, user_id))
         else:
@@ -412,7 +419,7 @@ def toggle_booking(params, request_id):
     finally:
         db_close(conn, cur)
 
-    return json_rpc_response({"success": True, "action": action, "seats": current_user_seats, "total_price": total_price}, None, request_id)
+    return json_rpc_response({"success": True, "results": results, "seats": current_user_seats, "total_price": total_price}, None, request_id)
 
 
 
