@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block lab %}Кинотеатр - Регистрация{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block main %}
+    <div class="rgz-container">
+        <div class="rgz-header">
+            <h1>📝 Регистрация</h1>
+            <p>Создайте новый аккаунт для бронирования билетов</p>
+            <a href="/rgz/" class="back-link">← На главную</a>
+        </div>
+
+        <div class="auth-form">
+            <h2>Заполните форму регистрации</h2>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/rgz/register">
+                <div class="form-group">
+                    <label for="full_name">ФИО:</label>
+                    <input type="text" id="full_name" name="full_name" required 
+                           placeholder="Введите ваше полное имя" value="{{ request.form.full_name if request.form.full_name else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="login">Логин:</label>
+                    <input type="text" id="login" name="login" required 
+                           placeholder="Придумайте логин" 
+                           pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]*"
+                           title="Только латинские буквы, цифры и знаки препинания"
+                           value="{{ request.form.login if request.form.login else '' }}">
+                    <small class="hint">Только латинские буквы, цифры и знаки препинания</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Придумайте пароль"
+                           pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]*"
+                           title="Только латинские буквы, цифры и знаки препинания">
+                    <small class="hint">Только латинские буквы, цифры и знаки препинания</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                    <a href="/rgz/login" class="login-link">Уже есть аккаунт? Войдите</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

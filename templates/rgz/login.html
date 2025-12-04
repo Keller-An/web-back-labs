@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block lab %}Кинотеатр - Вход{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block main %}
+    <div class="rgz-container">
+        <div class="rgz-header">
+            <h1>🔐 Вход в систему</h1>
+            <p>Войдите в свой аккаунт для бронирования билетов</p>
+            <a href="/rgz/" class="back-link">← На главную</a>
+        </div>
+
+        <div class="auth-form">
+            <h2>Введите ваши данные</h2>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/rgz/login">
+                <div class="form-group">
+                    <label for="login">Логин:</label>
+                    <input type="text" id="login" name="login" required 
+                           placeholder="Введите ваш логин" 
+                           pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]*"
+                           title="Только латинские буквы, цифры и знаки препинания"
+                           value="{{ request.form.login if request.form.login else '' }}">
+                    <small class="hint">Только латинские буквы, цифры и знаки препинания</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Введите ваш пароль"
+                           pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]*"
+                           title="Только латинские буквы, цифры и знаки препинания">
+                    <small class="hint">Только латинские буквы, цифры и знаки препинания</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Войти</button>
+                    <a href="/rgz/register" class="register-link">Нет аккаунта? Зарегистрируйтесь</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

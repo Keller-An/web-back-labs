@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block lab %}Кинотеатр - Регистрация успешна{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
+{% endblock %}
+
+{% block main %}
+    <div class="rgz-container">
+        <div class="rgz-header">
+            <h1>✅ Регистрация успешна!</h1>
+            <p>Ваш аккаунт был создан</p>
+        </div>
+
+        <div class="success-message">
+            <h2>Добро пожаловать, {{ login }}!</h2>
+            <p>Вы успешно зарегистрировались в системе кинотеатра.</p>
+            <p>Теперь вы можете бронировать места на сеансы.</p>
+            
+            <div class="success-actions">
+                <a href="/rgz/login" class="login-btn">Войти в систему</a>
+                <a href="/rgz/" class="home-btn">На главную</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
