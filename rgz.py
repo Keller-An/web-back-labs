@@ -67,13 +67,15 @@ def movie_sessions(movie_id):
         # Получаем информацию о фильме
         if current_app.config['DB_TYPE'] == 'postgres':
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=%s", (movie_id,))
+            movie_row = cur.fetchone()
         else:
             cur.execute("SELECT * FROM rgz_cinema_movies WHERE id=?", (movie_id,))
-        movie_row = cur.fetchone()
-        movie = dict(movie_row) if movie_row else None
+            movie_row = cur.fetchone()
         
-        if not movie:
+        if not movie_row:
             return "Фильм не найден", 404
+        
+        movie = dict(movie_row)  # конвертируем Row в словарь
         
         # Получаем сеансы фильма
         if current_app.config['DB_TYPE'] == 'postgres':
@@ -81,12 +83,14 @@ def movie_sessions(movie_id):
         else:
             cur.execute("SELECT * FROM rgz_cinema_sessions WHERE movie_id=? ORDER BY date, time", (movie_id,))
         sessions_rows = cur.fetchall()
-        sessions = [dict(s) for s in sessions_rows]
+        sessions = [dict(s) for s in sessions_rows]  # конвертируем Row в словарь
+    
     finally:
         db_close(conn, cur)
     
     login = session.get('login')
     return render_template('rgz/movie.html', movie=movie, sessions=sessions, login=login)
+
 
 
 # Страница бронирования мест
