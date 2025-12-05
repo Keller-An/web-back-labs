@@ -137,8 +137,15 @@
         const response = await fetch('/rgz/api', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({jsonrpc: '2.0', method, params, id: Math.floor(Math.random()*1000)})
+            credentials: 'include',   // ← ОБЯЗАТЕЛЬНО!
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method,
+                params,
+                id: Math.floor(Math.random() * 1000)
+            })
         });
+
         return await response.json();
     }
 
