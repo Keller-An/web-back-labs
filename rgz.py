@@ -165,7 +165,8 @@ def booking(session_id):
                 JOIN rgz_cinema_users u ON b.user_id = u.id
                 WHERE b.session_id=?
             """, (session_id,))
-        booked_seats = cur.fetchall()
+        booked_rows = cur.fetchall()
+        booked_seats = [dict(row) for row in booked_rows]
         
         # Получаем места текущего пользователя
         user_seats = []
@@ -176,7 +177,8 @@ def booking(session_id):
             else:
                 cur.execute("SELECT seat_number FROM rgz_cinema_bookings WHERE session_id=? AND user_id=?", 
                           (session_id, session['user_id']))
-            user_seats = [s['seat_number'] for s in cur.fetchall()]
+            user_seats_rows = cur.fetchall()
+            user_seats = [r['seat_number'] for r in user_seats_rows]
             
     finally:
         db_close(conn, cur)
