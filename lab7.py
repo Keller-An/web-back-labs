@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, abort, jsonify
+from datetime import datetime
 
 lab7 = Blueprint('lab7', __name__)
 
@@ -55,14 +56,14 @@ films = [
 
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
-    return films
+    return jsonify(films)
 
 
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['GET'])
 def get_film(id):
     if id < 0 or id >= len(films):
         abort(404)
-    return films[id]
+    return jsonify(films[id])
 
 
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
@@ -78,24 +79,64 @@ def put_film(id):
     if id < 0 or id >= len(films):
         abort(404)
     film = request.get_json()
-    if film['description'] == '':
-        return {'description': 'Заполните описание!'}, 400
-    
-    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
-        film['titile'] = film['title_ru']
 
-    films[id] = film
-    return films[id]
+    errors, validated_film = validate_film(film)
+    if errors:
+        return jsonify(errors), 400
+
+    films[id] = validated_film
+    return jsonify(validated_film)
 
 
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()
-    if not film.get('description', '').strip():
-        return{'description': 'Заполните описание'}, 400
-    
-    if not film.get('title', '').strip() and film.get('title_ru', '').strip():
-        film['title'] = film['title_ru']
-        
-    films.append(film)
-    return{"id": len(films) - 1}
+
+    errors, validated_film = validate_film(film)
+    if errors:
+        return jsonify(errors), 400
+
+    films.append(validated_film)
+    return jsonify({"id": len(films) - 1}), 201
+
+
+def validate_film(film):
+    errors = {}
+    current_year = datetime.now().year
+
+    title = film.get('title', '').strip()
+    title_ru = film.get('title_ru', '').strip()
+
+    # если нет ни одного названия — ошибка
+    if not title and not title_ru:
+        errors['title'] = 'Необходимо указать хотя бы одно название: оригинальное или русское'
+
+    # если есть русское название, но оригинальное пустое — присваиваем
+    if not title and title_ru:
+        title = title_ru
+
+    # проверка года
+    try:
+        year_int = int(film.get('year', 0))
+        if year_int < 1895:
+            errors['year'] = f'Год фильма не может быть раньше 1895'
+        elif year_int > current_year:
+            errors['year'] = f'Год фильма не может быть больше {current_year}'
+    except (ValueError, TypeError):
+        errors['year'] = 'Год фильма должен быть числом'
+
+    # проверка описания
+    description = film.get('description', '').strip()
+    if not description:
+        errors['description'] = 'Описание обязательно для заполнения'
+    elif len(description) > 2000:
+        errors['description'] = f'Описание не должно превышать 2000 символов (сейчас: {len(description)})'
+
+    validated_film = {
+        'title': title,
+        'title_ru': title_ru,
+        'year': year_int if 'year_int' in locals() else 0,
+        'description': description
+    }
+
+    return errors, validated_film
