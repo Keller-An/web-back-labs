@@ -264,7 +264,7 @@
             for (const seat of [...selectedSeats]) {
                 await callApi('toggle_booking', { 
                     session_id: sessionId, 
-                    seat_number: seat, 
+                    seat_numbers: [...selectedSeats], 
                     action_type: 'cancel' 
                 });
             }
