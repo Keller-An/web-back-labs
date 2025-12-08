@@ -2,11 +2,6 @@
 
 {% block lab %}Кинотеатр - {{ movie.title }}{% endblock %}
 
-{% block script %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
-{% endblock %}
-
 {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='rgz.css') }}">
 {% endblock %}

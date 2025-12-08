@@ -522,7 +522,6 @@ def admin_delete_session(params, request_id):
 
 
 #  снятие брони администратором
-# Исправьте функцию admin_cancel_booking:
 def admin_cancel_booking(params, request_id):
     if not session.get('is_admin'):
         return json_rpc_response(None, {"code": 1, "message": "Требуется администратор"}, request_id)

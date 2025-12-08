@@ -88,7 +88,7 @@
     <!-- Действия администратора -->
     {% if session.get('is_admin') %}
     <div class="admin-actions-panel">
-        <h3>👑 Действия администратора</h3>
+        <h3>Действия администратора</h3>
         <button onclick="adminCancelAllBookings()" class="admin-cancel-all-btn">
             ❌ Отменить ВСЕ бронирования на этом сеансе
         </button>
@@ -137,7 +137,7 @@
         const response = await fetch('/rgz/api', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            credentials: 'include',   // ← ОБЯЗАТЕЛЬНО!
+            credentials: 'include', 
             body: JSON.stringify({
                 jsonrpc: '2.0',
                 method,
@@ -424,6 +424,12 @@
         font-style: italic;
         margin-top: 10px;
         font-size: 12px;
+    }
+    h3 {
+        color: #e0a800;
+    }
+    .seat-number {
+        color: #666;
     }
 </style>
 {% endblock %}
