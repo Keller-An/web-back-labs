@@ -184,18 +184,23 @@ def articles_list():
 def search_articles():
     search_query = request.args.get('q', '').strip()
 
+    from sqlalchemy import or_, func
+
     if current_user.is_authenticated:
-        base_filter = (articles.login_id == current_user.id) | (articles.is_public == True)
+        base_filter = or_(
+            articles.login_id == current_user.id,
+            articles.is_public == True
+        )
     else:
         base_filter = articles.is_public == True
 
     if search_query:
-        q = f"%{search_query.lower()}%"
+        q = search_query.lower()
         user_articles = articles.query.filter(
             base_filter,
             or_(
-                func.lower(articles.title).like(q),
-                func.lower(articles.article_text).like(q)
+                func.lower(articles.title).contains(q),
+                func.lower(articles.article_text).contains(q)
             )
         ).all()
     else:
@@ -206,3 +211,4 @@ def search_articles():
         articles=user_articles,
         search_query=search_query
     )
+
