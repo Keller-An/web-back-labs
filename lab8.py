@@ -160,13 +160,51 @@ def delete(article_id):
 
 @lab8.route('/lab8/articles/')
 def articles_list():
+    # Проверяем, есть ли параметр поиска
+    search_query = request.args.get('q', '').strip()
+    
+    if search_query:
+        # Если есть поисковый запрос, используем функцию поиска
+        return search_articles()
+    
+    # Иначе показываем все статьи как раньше
     if current_user.is_authenticated:
-        # все статьи пользователя + публичные статьи других
         user_articles = articles.query.filter(
             (articles.login_id == current_user.id) | (articles.is_public == True)
         ).all()
     else:
-        # только публичные статьи
         user_articles = articles.query.filter_by(is_public=True).all()
 
     return render_template('lab8/articles.html', articles=user_articles)
+
+
+
+@lab8.route('/lab8/articles/search/', methods=['GET'])
+def search_articles():
+    search_query = request.args.get('q', '').strip()
+    
+    if not search_query:
+        if current_user.is_authenticated:
+            user_articles = articles.query.filter(
+                (articles.login_id == current_user.id) | (articles.is_public == True)
+            ).all()
+        else:
+            user_articles = articles.query.filter_by(is_public=True).all()
+    else:
+        # Регистронезависимый поиск
+        if current_user.is_authenticated:
+            user_articles = articles.query.filter(
+                (articles.login_id == current_user.id) | (articles.is_public == True),
+                (articles.title.ilike(f'%{search_query}%') | 
+                 articles.article_text.ilike(f'%{search_query}%'))
+            ).all()
+        else:
+            user_articles = articles.query.filter(
+                articles.is_public == True,
+                (articles.title.ilike(f'%{search_query}%') | 
+                 articles.article_text.ilike(f'%{search_query}%'))
+            ).all()
+    
+    return render_template('lab8/articles.html', 
+                          articles=user_articles, 
+                          search_query=search_query)

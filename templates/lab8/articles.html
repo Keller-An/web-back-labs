@@ -4,12 +4,33 @@
 
 {% block main %}
 <div class="articles-container">
+    <div class="search-container">
+        <form action="{{ url_for('lab8.articles_list') }}" method="get" class="search-form">
+            <input type="text" 
+                   name="q" 
+                   value="{{ search_query if search_query else '' }}" 
+                   placeholder="🔍 Поиск по статьям..."
+                   class="search-input">
+            <button type="submit" class="search-btn">Найти</button>
+            {% if search_query %}
+                <a href="{{ url_for('lab8.articles_list') }}" class="clear-search">Очистить поиск</a>
+            {% endif %}
+        </form>
+    </div>
+
     <div class="articles-header">
-        <h1>Ваши статьи</h1>
+        <h1> Статьи</h1>
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('lab8.create') }}" class="create-btn">+ Создать статью</a>
         {% endif %}
     </div>
+
+    {% if search_query %}
+        <div class="search-results-info">
+            <p>🔍 Результаты поиска по запросу: <strong>"{{ search_query }}"</strong></p>
+            <p>Найдено статей: <strong>{{ articles|length }}</strong></p>
+        </div>
+    {% endif %}
 
     {% if articles %}
         <div class="articles-grid">
@@ -42,19 +63,65 @@
         </div>
     {% else %}
         <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <h3>Пока нет статей</h3>
-            {% if current_user.is_authenticated %}
-                <p>Создайте свою первую статью!</p>
-                <a href="{{ url_for('lab8.create') }}" class="btn create-btn">Создать статью</a>
+            <div class="empty-icon">🔍</div>
+            {% if search_query %}
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить поисковый запрос</p>
+            {% else %}
+                <h3>Пока нет статей</h3>
+                {% if current_user.is_authenticated %}
+                    <p>Создайте свою первую статью!</p>
+                    <a href="{{ url_for('lab8.create') }}" class="btn create-btn">Создать статью</a>
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}
 </div>
 
-
-
 <style>
+.search-container {
+    margin-bottom: 30px;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 12px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.search-btn {
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.clear-search {
+    color: #000000;
+}
+
+.search-results-info {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+}
+
+
 .articles-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -71,7 +138,7 @@
 }
 
 .articles-header h1 {
-    color: #ffdc51;
+    color: #2c3e50;
     margin: 0;
 }
 
@@ -82,10 +149,11 @@
     border-radius: 8px;
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.3s ease;
 }
 
-
+.create-btn:hover {
+    background-color: #2980b9;
+}
 
 .article-card {
     background: white;
@@ -93,15 +161,8 @@
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     border: 1px solid #eaeaea;
-    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-}
-
-
-
-.article-header {
-    margin-bottom: 15px;
 }
 
 .article-title {
@@ -109,12 +170,6 @@
     margin: 0 0 10px 0;
     font-size: 1.3rem;
     line-height: 1.4;
-}
-
-.article-tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
 }
 
 .tag {
@@ -141,7 +196,6 @@
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
-
 
 .article-actions {
     display: flex;
@@ -181,13 +235,5 @@
     color: #e53e3e;
     border: 1px solid #fed7d7;
 }
-
-.delete-btn:hover {
-    background-color: #fed7d7;
-    color: #c53030;
-}
-
-
-
 </style>
 {% endblock %}
