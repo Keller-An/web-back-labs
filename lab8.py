@@ -187,32 +187,25 @@ def search_articles():
     if not query:
         return redirect('/lab8/articles/')
 
-    search_pattern = f"%{query}%"
-
     if current_user.is_authenticated:
-        articles_list = articles.query.filter(
-            or_(
-                articles.login_id == current_user.id,
-                articles.is_public == True
-            ),
-            or_(
-                articles.title.ilike(search_pattern),
-                articles.article_text.ilike(search_pattern)
-            )
+        base_articles = articles.query.filter(
+            (articles.login_id == current_user.id) |
+            (articles.is_public == True)
         ).all()
     else:
-        articles_list = articles.query.filter(
-            articles.is_public == True,
-            or_(
-                articles.title.ilike(search_pattern),
-                articles.article_text.ilike(search_pattern)
-            )
-        ).all()
+        base_articles = articles.query.filter_by(is_public=True).all()
+
+    q = query.casefold()
+
+    articles_list = [
+        a for a in base_articles
+        if q in a.title.casefold()
+        or q in a.article_text.casefold()
+    ]
 
     return render_template(
         'lab8/articles.html',
         articles=articles_list,
         search_query=query
     )
-
 
