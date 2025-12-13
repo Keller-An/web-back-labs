@@ -5,47 +5,54 @@
 {% block main %}
 <div class="articles-container">
     <div class="articles-header">
-        <h1> Ваши статьи</h1>
-        <a href="{{ url_for('lab8.create') }}" class="create-btn">+ Создать статью</a>
+        <h1>Ваши статьи</h1>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('lab8.create') }}" class="create-btn">+ Создать статью</a>
+        {% endif %}
     </div>
 
     {% if articles %}
         <div class="articles-grid">
             {% for article in articles %}
-            <div class="article-card">
-                <div class="article-header">
-                    <h3 class="article-title">{{ article.title }}</h3>
-                    <div class="article-tags">
-                        {% if article.is_favorite %}
-                            <span class="tag favorite">⭐ Избранная</span>
-                        {% endif %}
-                        {% if article.is_public %}
-                            <span class="tag public">🌐 Публичная</span>
-                        {% else %}
-                            <span class="tag private">🔒 Приватная</span>
-                        {% endif %}
+                <div class="article-card">
+                    <div class="article-header">
+                        <h3 class="article-title">{{ article.title }}</h3>
+                        <div class="article-tags">
+                            {% if article.is_favorite %}
+                                <span class="tag favorite">⭐ Избранная</span>
+                            {% endif %}
+                            {% if article.is_public %}
+                                <span class="tag public">🌐 Публичная</span>
+                            {% else %}
+                                <span class="tag private">🔒 Приватная</span>
+                            {% endif %}
+                        </div>
                     </div>
+
+                    {% if current_user.is_authenticated and article.login_id == current_user.id %}
+                        <div class="article-actions">
+                            <a href="{{ url_for('lab8.edit', article_id=article.id) }}" class="btn edit-btn">✏️ Редактировать</a>
+                            <form action="{{ url_for('lab8.delete', article_id=article.id) }}" method="post" class="delete-form">
+                                <button type="submit" class="btn delete-btn" onclick="return confirm('Удалить статью?')">🗑️ Удалить</button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
-                
-                
-                <div class="article-actions">
-                    <a href="{{ url_for('lab8.edit', article_id=article.id) }}" class="btn edit-btn">✏️ Редактировать</a>
-                    <form action="{{ url_for('lab8.delete', article_id=article.id) }}" method="post" class="delete-form">
-                        <button type="submit" class="btn delete-btn" onclick="return confirm('Удалить статью?')">🗑️ Удалить</button>
-                    </form>
-                </div>
-            </div>
             {% endfor %}
         </div>
     {% else %}
         <div class="empty-state">
             <div class="empty-icon">📝</div>
-            <h3>У вас пока нет статей</h3>
-            <p>Создайте свою первую статью!</p>
-            <a href="{{ url_for('lab8.create') }}" class="btn create-btn">Создать статью</a>
+            <h3>Пока нет статей</h3>
+            {% if current_user.is_authenticated %}
+                <p>Создайте свою первую статью!</p>
+                <a href="{{ url_for('lab8.create') }}" class="btn create-btn">Создать статью</a>
+            {% endif %}
         </div>
     {% endif %}
 </div>
+
+
 
 <style>
 .articles-container {

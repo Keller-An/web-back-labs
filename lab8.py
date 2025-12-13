@@ -159,7 +159,14 @@ def delete(article_id):
 
 
 @lab8.route('/lab8/articles/')
-@login_required
 def articles_list():
-    user_articles = articles.query.filter_by(login_id=current_user.id).all()
+    if current_user.is_authenticated:
+        # все статьи пользователя + публичные статьи других
+        user_articles = articles.query.filter(
+            (articles.login_id == current_user.id) | (articles.is_public == True)
+        ).all()
+    else:
+        # только публичные статьи
+        user_articles = articles.query.filter_by(is_public=True).all()
+
     return render_template('lab8/articles.html', articles=user_articles)
