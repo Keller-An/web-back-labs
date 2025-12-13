@@ -180,35 +180,39 @@ def articles_list():
 
 
 
-@lab8.route('/lab8/articles/search/', methods=['GET'])
+@lab8.route('/lab8/articles/search', methods=['GET', 'POST'])
 def search_articles():
-    search_query = request.args.get('q', '').strip()
+    query = request.args.get('q', '').strip()
 
-    from sqlalchemy import or_, func
+    if not query:
+        return redirect('/lab8/articles/')
+
+    search_pattern = f"%{query}%"
 
     if current_user.is_authenticated:
-        base_filter = or_(
-            articles.login_id == current_user.id,
-            articles.is_public == True
-        )
-    else:
-        base_filter = articles.is_public == True
-
-    if search_query:
-        q = search_query.lower()
-        user_articles = articles.query.filter(
-            base_filter,
+        articles_list = articles.query.filter(
             or_(
-                func.lower(articles.title).contains(q),
-                func.lower(articles.article_text).contains(q)
+                articles.login_id == current_user.id,
+                articles.is_public == True
+            ),
+            or_(
+                articles.title.ilike(search_pattern),
+                articles.article_text.ilike(search_pattern)
             )
         ).all()
     else:
-        user_articles = articles.query.filter(base_filter).all()
+        articles_list = articles.query.filter(
+            articles.is_public == True,
+            or_(
+                articles.title.ilike(search_pattern),
+                articles.article_text.ilike(search_pattern)
+            )
+        ).all()
 
     return render_template(
         'lab8/articles.html',
-        articles=user_articles,
-        search_query=search_query
+        articles=articles_list,
+        search_query=query
     )
+
 
