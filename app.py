@@ -5,6 +5,7 @@ from os import path
 from flask_sqlalchemy import SQLAlchemy
 from db.models import users
 from flask_login import LoginManager
+from datetime import timedelta
 
 from db import db
 from lab1 import lab1
@@ -27,8 +28,9 @@ login_manager.init_app(app)
 def load_users(login_id):
     return users.query.get(int(login_id))
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'секретно-секретный ключ')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super-secret-key-123')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'anastasia_maxmadbekova_orm'

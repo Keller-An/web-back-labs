@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block lab %}Создание статьи{% endblock %}
+{% block main %}
+<h2>Создать статью</h2>
+
+{% if error %}
+<div style="color: red;">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+    <div>
+        <label>Заголовок: <input type="text" name="title" value="{{ title if title else '' }}"></label>
+    </div>
+    <div>
+        <label>Текст статьи:</label><br>
+        <textarea name="article_text" rows="8" cols="60">{{ article_text if article_text else '' }}</textarea>
+    </div>
+    <div>
+        <label><input type="checkbox" name="is_public" value="1" {% if is_public %}checked{% endif %}> Публичная статья</label>
+    </div>
+    <div>
+        <label><input type="checkbox" name="is_favorite" value="1" {% if is_favorite %}checked{% endif %}> Добавить в избранное</label>
+    </div>
+    <button type="submit">Создать</button>
+</form>
+{% endblock %}

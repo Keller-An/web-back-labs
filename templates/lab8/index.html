@@ -6,12 +6,23 @@
 <h1>База знаний</h1>
 <div class="menu-bar">
     <div class="menu-links">
-        <a href="{{ url_for('lab8.login') }}">Войти</a>
-        <a href="{{ url_for('lab8.register') }}">Регистрация</a>
-        <a href="{{ url_for('lab8.articles') }}">Список статей</a>
-        <a href="{{ url_for('lab8.create') }}">Создать статью</a>
+        {% if not login %}
+            <a href="{{ url_for('lab8.login') }}">Войти</a>
+            <a href="{{ url_for('lab8.register') }}">Регистрация</a>
+        {% else %}
+        <a href="{{ url_for('lab8.logout') }}" style="color: #dc3545;">Выйти</a>
+        {% endif %}
+        
+        <a href="{{ url_for('lab8.articles_list') }}">Список статей</a>
+        
+        {% if login %}
+            <a href="{{ url_for('lab8.create') }}">Создать статью</a>
+        {% endif %}
+
     </div>
-    <span class="username1">{{ login }}</span>
+    {% if login %}
+        <span class="username"> {{ login }}</span>
+    {% endif %}
 </div>
 
 
@@ -24,7 +35,7 @@
     gap: 40px;
     margin: 20px 0;
     padding: 12px 20px;
-    background-color: #f4f6f8;
+    background-color: #14385c;
     border-radius: 8px;
 }
 
@@ -50,6 +61,15 @@
 
 .menu-bar1 a:hover {
     background-color: #e0e6eb;
+}
+
+.username {
+    font-weight: bold;
+    color: #e3e310;
+    background-color: #3e6d8e;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 20px;
 }
 </style>
 

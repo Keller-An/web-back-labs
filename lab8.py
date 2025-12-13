@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, session
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 from db.models import users, articles
 
 lab8 = Blueprint('lab8', __name__)
@@ -9,7 +9,9 @@ lab8 = Blueprint('lab8', __name__)
 
 @lab8.route('/lab8/')
 def main():
-    return render_template('lab8/index.html', login = 'anonymous')
+    if current_user.is_authenticated:
+        return render_template('lab8/index.html', login=current_user.login)
+    return render_template('lab8/index.html')
 
 
 @lab8.route('/lab8/login/', methods = ['GET', 'POST'])
@@ -19,6 +21,7 @@ def login():
     
     login_form = request.form.get('login')
     password_form = request.form.get('password')
+    remember_me = request.form.get('remember_me')
 
     if not login_form or login_form.strip() == '':
         return render_template('lab8/login.html',
@@ -32,7 +35,8 @@ def login():
 
     if user:
         if check_password_hash(user.password, password_form):
-            login_user(user, remember = False)
+            remember = bool(remember_me)
+            login_user(user, remember = remember)
             return redirect('/lab8/')
 
     return render_template('/lab8/login.html',
@@ -62,14 +66,14 @@ def register():
     
     password_hash = generate_password_hash(password_form)
     new_user = users(login = login_form, password = password_hash)
+
     db.session.add(new_user)
     db.session.commit()
+
+    login_user(new_user, remember = False)
+
     return redirect('/lab8/')
 
-
-@lab8.route('/lab8/articles/')
-def articles_list():
-    return "список статей"
 
 
 @lab8.route('/lab8/logout')
@@ -79,7 +83,83 @@ def logout():
     return redirect('/lab8/')
 
 
-@lab8.route('/create')
+@lab8.route('/lab8/create/', methods=['GET', 'POST'])
 @login_required
 def create():
-    return ''
+    if request.method == 'GET':
+        return render_template('lab8/create.html')
+
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
+    is_public = bool(request.form.get('is_public'))
+    is_favorite = bool(request.form.get('is_favorite'))
+
+    if not title or not article_text:
+        return render_template('lab8/create.html', 
+                               error='Все поля обязательны!',
+                               title=title, 
+                               article_text=article_text,
+                               is_public=is_public,
+                               is_favorite=is_favorite)
+
+    new_article = articles(
+        login_id=current_user.id,
+        title=title,
+        article_text=article_text,
+        is_public=is_public,
+        is_favorite=is_favorite,
+        likes=0
+    )
+    db.session.add(new_article)
+    db.session.commit()
+
+    return redirect('/lab8/articles/')
+
+
+@lab8.route('/lab8/edit/<int:article_id>/', methods=['GET', 'POST'])
+@login_required
+def edit(article_id):
+    article = articles.query.get_or_404(article_id)
+
+    if article.login_id != current_user.id:
+        return "Доступ запрещен", 403
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        article_text = request.form.get('article_text')
+        is_public = bool(request.form.get('is_public'))
+        is_favorite = bool(request.form.get('is_favorite'))
+
+        if not title or not article_text:
+            return render_template('lab8/edit.html', error='Все поля обязательны!', article=article)
+
+        article.title = title
+        article.article_text = article_text
+        article.is_public = is_public
+        article.is_favorite = is_favorite
+
+        db.session.commit()
+        return redirect('/lab8/articles/')
+
+    return render_template('lab8/edit.html', article=article)
+
+
+@lab8.route('/lab8/delete/<int:article_id>/', methods=['POST'])
+@login_required
+def delete(article_id):
+    article = articles.query.get_or_404(article_id)
+
+    if article.login_id != current_user.id:
+        return "Доступ запрещен", 403
+
+    db.session.delete(article)
+    db.session.commit()
+    return redirect('/lab8/articles/')
+
+
+
+@lab8.route('/lab8/articles/')
+@login_required
+def articles_list():
+    user_articles = articles.query.filter_by(login_id=current_user.id).all()
+    return render_template('lab8/articles.html', articles=user_articles)

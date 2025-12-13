@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block lab %}Список статей{% endblock %}
+
+{% block main %}
+<div class="articles-container">
+    <div class="articles-header">
+        <h1> Ваши статьи</h1>
+        <a href="{{ url_for('lab8.create') }}" class="create-btn">+ Создать статью</a>
+    </div>
+
+    {% if articles %}
+        <div class="articles-grid">
+            {% for article in articles %}
+            <div class="article-card">
+                <div class="article-header">
+                    <h3 class="article-title">{{ article.title }}</h3>
+                    <div class="article-tags">
+                        {% if article.is_favorite %}
+                            <span class="tag favorite">⭐ Избранная</span>
+                        {% endif %}
+                        {% if article.is_public %}
+                            <span class="tag public">🌐 Публичная</span>
+                        {% else %}
+                            <span class="tag private">🔒 Приватная</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                
+                <div class="article-actions">
+                    <a href="{{ url_for('lab8.edit', article_id=article.id) }}" class="btn edit-btn">✏️ Редактировать</a>
+                    <form action="{{ url_for('lab8.delete', article_id=article.id) }}" method="post" class="delete-form">
+                        <button type="submit" class="btn delete-btn" onclick="return confirm('Удалить статью?')">🗑️ Удалить</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>У вас пока нет статей</h3>
+            <p>Создайте свою первую статью!</p>
+            <a href="{{ url_for('lab8.create') }}" class="btn create-btn">Создать статью</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.articles-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.articles-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eaeaea;
+}
+
+.articles-header h1 {
+    color: #ffdc51;
+    margin: 0;
+}
+
+.create-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+
+
+.article-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eaeaea;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.article-header {
+    margin-bottom: 15px;
+}
+
+.article-title {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 1.3rem;
+    line-height: 1.4;
+}
+
+.article-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.tag.favorite {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.tag.public {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.tag.private {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+.article-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.edit-btn {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    flex-grow: 1;
+}
+
+.edit-btn:hover {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+.delete-btn {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+}
+
+.delete-btn:hover {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+
+
+</style>
+{% endblock %}
