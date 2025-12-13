@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
+from sqlalchemy import or_, func
 from flask_login import login_user, login_required, current_user, logout_user
 from db.models import users, articles
 
@@ -182,29 +183,26 @@ def articles_list():
 @lab8.route('/lab8/articles/search/', methods=['GET'])
 def search_articles():
     search_query = request.args.get('q', '').strip()
-    
-    if not search_query:
-        if current_user.is_authenticated:
-            user_articles = articles.query.filter(
-                (articles.login_id == current_user.id) | (articles.is_public == True)
-            ).all()
-        else:
-            user_articles = articles.query.filter_by(is_public=True).all()
+
+    if current_user.is_authenticated:
+        base_filter = (articles.login_id == current_user.id) | (articles.is_public == True)
     else:
-        # Регистронезависимый поиск
-        if current_user.is_authenticated:
-            user_articles = articles.query.filter(
-                (articles.login_id == current_user.id) | (articles.is_public == True),
-                (articles.title.ilike(f'%{search_query}%') | 
-                 articles.article_text.ilike(f'%{search_query}%'))
-            ).all()
-        else:
-            user_articles = articles.query.filter(
-                articles.is_public == True,
-                (articles.title.ilike(f'%{search_query}%') | 
-                 articles.article_text.ilike(f'%{search_query}%'))
-            ).all()
-    
-    return render_template('lab8/articles.html', 
-                          articles=user_articles, 
-                          search_query=search_query)
+        base_filter = articles.is_public == True
+
+    if search_query:
+        q = f"%{search_query.lower()}%"
+        user_articles = articles.query.filter(
+            base_filter,
+            or_(
+                func.lower(articles.title).like(q),
+                func.lower(articles.article_text).like(q)
+            )
+        ).all()
+    else:
+        user_articles = articles.query.filter(base_filter).all()
+
+    return render_template(
+        'lab8/articles.html',
+        articles=user_articles,
+        search_query=search_query
+    )
