@@ -8,7 +8,6 @@
 
 {% block main %}
 <div class="container">
-    <!-- Скрытый элемент для статуса авторизации -->
     <div id="auth-status" data-authenticated="{{ 'true' if is_auth else 'false' }}" style="display: none;"></div>
     
     <h1>🎄 Новогодние Подарки 🎄</h1>
@@ -69,6 +68,16 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Модальное окно подарка -->
+    <div id="gift-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <p id="modal-message"></p>
+            <img id="modal-image" src="" alt="Подарок">
+        </div>
+    </div>
+
     
     <div style="text-align: center; margin-top: 20px; color: #FFD700;">
         <p>🎁 Нажмите на коробку, чтобы открыть подарок! Можно открыть не более 3 коробок.</p>
@@ -76,14 +85,10 @@
     </div>
 </div>
 
-<!-- Снежинки -->
 <div class="snowflakes"></div>
 
-<!-- Сообщения будут отображаться здесь -->
-<div id="message-area"></div>
 
 <style>
-    /* Основные стили */
     body {
         background: linear-gradient(135deg, #1a2980, #26d0ce);
         color: white;
@@ -106,6 +111,51 @@
         font-size: 2.5em;
         margin-bottom: 20px;
     }
+
+    .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    }
+
+    .modal.hidden {
+        display: none;
+    }
+
+    .modal-content {
+        background: #ffffff;
+        color: #333;
+        padding: 25px;
+        border-radius: 12px;
+        max-width: 420px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+    }
+
+    .modal-content img {
+        max-width: 100%;
+        margin-top: 15px;
+        border-radius: 10px;
+    }
+
+    .modal-content p {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
     
     .stats {
         background: rgba(255, 255, 255, 0.1);
@@ -165,7 +215,6 @@
         display: inline-block;
     }
 
-    
     #santa-btn {
         background: linear-gradient(45deg, #00b09b, #96c93d);
     }
@@ -196,13 +245,12 @@
         margin: 20px 0;
     }
     
-    /* Коробка с подарком */
     .gift-box {
         position: absolute;
         transition: transform 0.3s, filter 0.3s;
         cursor: pointer;
-        width: 120px;
-        height: 120px;
+        width: 170px;
+        height: 170px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -211,7 +259,7 @@
     .gift-box-image {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+
     }
     
     .opened-gift {
@@ -234,7 +282,6 @@
         border: 2px solid #FFD700;
     }
     
-    /* Иконка замка */
     .lock-icon {
         position: absolute;
         top: 5px;

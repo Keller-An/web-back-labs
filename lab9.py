@@ -371,6 +371,7 @@ def login():
     finally:
         db_close(conn, cur)
 
+
 @lab9.route('/lab9/register', methods=['GET', 'POST'])
 def register():
     """Страница регистрации"""
@@ -450,6 +451,7 @@ def register():
     finally:
         db_close(conn, cur)
 
+
 @lab9.route('/lab9/logout')
 def logout():
     """Выход из системы"""
@@ -500,7 +502,7 @@ def santa():
         
         return jsonify({
             'success': True,
-            'message': '🎅 Дедушка Мороз наполнил все подарки снова! Позиции обновлены!'
+            'message': '🎅 Дедушка Мороз добавил вам подарки!'
         })
         
     except Exception as e:
