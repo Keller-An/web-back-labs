@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, jsonify, request, current_app, redirect, url_for
+from flask import Blueprint, render_template, session, jsonify, request, current_app, redirect
 import random
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,16 +40,14 @@ def generate_non_overlapping_positions():
     """Генерация непересекающихся позиций для коробок"""
     positions = []
     attempts = 0
-    max_attempts = 1000
+    max_attempts = 2000
     
-    # Увеличиваем размеры коробки (стало шире)
-    box_width = 18  # Было 15
-    box_height = 22  # Было 20
+    box_width = 18  
+    box_height = 22 
     
     while len(positions) < 10 and attempts < max_attempts:
-        # Делаем рамку пошире (меньше отступы от краев)
-        top = random.randint(3, 87 - box_height)  # Было 5, 85
-        left = random.randint(3, 87 - box_width)  # Было 5, 85
+        top = random.randint(2, 87 - box_height)  
+        left = random.randint(2, 87 - box_width)  
 
         overlap = False
         for (existing_top, existing_left) in positions:
@@ -70,6 +68,7 @@ def generate_non_overlapping_positions():
         positions.append((top, left))
     
     return positions
+
 
 @lab9.route('/lab9/')
 def main():
@@ -313,6 +312,7 @@ def open_gift():
     finally:
         db_close(conn, cur)
 
+
 @lab9.route('/lab9/login', methods=['GET', 'POST'])
 def login():
     """Страница входа"""
@@ -460,6 +460,8 @@ def logout():
     session.pop('lab9_login', None)
     session.pop('lab9_auth_user_id', None)
     return redirect('/lab9/')
+
+
 
 @lab9.route('/lab9/santa', methods=['POST'])
 def santa():
