@@ -10,12 +10,12 @@
 <div class="container">
     <div id="auth-status" data-authenticated="{{ 'true' if is_auth else 'false' }}" style="display: none;"></div>
     
-    <h1>🎄 Новогодние Подарки 🎄</h1>
+    <h1>✨ Поздравление с Новым годом! ✨</h1>
     
     <div class="auth-controls">
         {% if is_auth %}
         <div class="user-info">
-            Добро пожаловать, {{ login }}!
+            Добро пожаловать, <span class="username">{{ login }}</span>!
             <a href="{{ url_for('lab9.logout') }}" class="btn btn-logout">Выйти</a>
         </div>
         {% else %}
@@ -26,100 +26,341 @@
         {% endif %}
     </div>
     
-    <div class="stats">
-        <div class="stat-item">
-            <div class="stat-label">Открыто коробок:</div>
-            <div class="stat-value" id="opened-count">{{ opened_count }}</div>
+    <div class="gift-counter">
+        <div class="counter-item">
+            <div class="counter-icon">📦</div>
+            <div class="counter-text">
+                <span class="counter-label">Открыто:</span>
+                <span class="counter-value" id="opened-count">{{ opened_count }}</span>
+            </div>
         </div>
-        <div class="stat-item">
-            <div class="stat-label">Оставшихся подарков:</div>
-            <div class="stat-value" id="remaining-count">{{ remaining }}</div>
+        <div class="counter-item">
+            <div class="counter-icon">🎁</div>
+            <div class="counter-text">
+                <span class="counter-label">Осталось:</span>
+                <span class="counter-value" id="remaining-count">{{ remaining }}</span>
+            </div>
+        </div>
+        <div class="counter-item">
+            <div class="counter-icon">⭐</div>
+            <div class="counter-text">
+                <span class="counter-label">Лимит:</span>
+                <span class="counter-value">3</span>
+            </div>
         </div>
     </div>
     
     <div class="controls">
         {% if is_auth %}
-        <button id="santa-btn" class="btn">🎅 Попросите Деда Мороза наполнить все подарки!</button>
+        <button id="santa-btn" class="btn santa-btn">
+            <span class="santa-icon">🎅</span>
+            <span class="santa-text">Попросить Дедушку Мороза о новых подарках!</span>
+        </button>
         {% endif %}
     </div>
     
-    <div id="gifts-container">
-        {% for gift in gifts %}
-        <div class="gift-box {% if gift.opened %}opened{% endif %}" 
-             data-id="{{ gift.position_id }}"
-             data-require-auth="{{ gift.require_auth }}"
-             style="top: {{ gift.top_position }}%; left: {{ gift.left_position }}%;">
-            {% if gift.opened %}
-            <div class="opened-gift">
-                <div class="congratulation">
-                    <p>{{ gift.message }}</p>
+    <div class="gifts-frame">        
+        <div id="gifts-container">
+            {% for gift in gifts %}
+            <div class="gift-box {% if gift.opened %}opened{% endif %}" 
+                 data-id="{{ gift.position_id }}"
+                 data-require-auth="{{ gift.require_auth }}"
+                 style="top: {{ gift.top_position }}%; left: {{ gift.left_position }}%;">
+                {% if gift.opened %}
+                <div class="opened-gift">
+                    <div class="congratulation">
+                        <p>{{ gift.message }}</p>
+                    </div>
+                    <img src="{{ gift.image }}" alt="Подарок" class="gift-inside">
                 </div>
-                <img src="{{ gift.image }}" alt="Подарок" class="gift-inside">
+                {% else %}
+                <img src="{{ gift.box_image }}" 
+                     alt="Подарок {{ gift.position_id + 1 }}"
+                     title="{% if gift.require_auth and not is_auth %}Требуется авторизация{% else %}Нажмите, чтобы открыть!{% endif %}"
+                     class="gift-box-image">
+                {% if gift.require_auth and not is_auth %}
+                <div class="lock-overlay">
+                    <div class="lock-icon">🔒</div>
+                    <div class="lock-text">Войдите</div>
+                </div>
+                {% endif %}
+                {% endif %}
             </div>
-            {% else %}
-            <img src="{{ gift.box_image }}" 
-                 alt="Подарок {{ gift.position_id + 1 }}"
-                 title="{% if gift.require_auth and not is_auth %}Требуется авторизация{% else %}Открыть подарок{% endif %}"
-                 class="gift-box-image">
-            {% if gift.require_auth and not is_auth %}
-            <div class="lock-icon">🔒</div>
-            {% endif %}
-            {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 
     <!-- Модальное окно подарка -->
     <div id="gift-modal" class="modal hidden">
         <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <p id="modal-message"></p>
-            <img id="modal-image" src="" alt="Подарок">
+            <div class="modal-header">
+                <h3>🎉 Ваш подарок!</h3>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <img id="modal-image" src="" alt="Подарок" class="modal-gift-img">
+                <p id="modal-message" class="modal-message"></p>
+            </div>
         </div>
     </div>
-
     
-    <div style="text-align: center; margin-top: 20px; color: #FFD700;">
-        <p>🎁 Нажмите на коробку, чтобы открыть подарок! Можно открыть не более 3 коробок.</p>
-        <p>🌟 Последние 5 подарков доступны только авторизованным пользователям!</p>
+    <div class="instructions">
+        <p>🎁 <strong>Как играть:</strong> Кликните на коробку, чтобы открыть подарок! Можно открыть максимум 3 коробки.</p>
+        <p>🔒 <strong>Специальные подарки:</strong> Последние 5 подарков доступны только авторизованным пользователям!</p>
+        <p>🎅 <strong>Бонус:</strong> Авторизованные пользователи могут попросить Деда Мороза обновить подарки!</p>
     </div>
 </div>
 
-<div class="snowflakes"></div>
-
+<div class="new-year-decorations"></div>
 
 <style>
     body {
-        background: linear-gradient(135deg, #1a2980, #26d0ce);
+        background: linear-gradient(135deg, #0c2461, #1e3799, #4a69bd);
         color: white;
         font-family: 'Arial', sans-serif;
         min-height: 100vh;
         margin: 0;
         padding: 20px;
+        overflow-x: hidden;
     }
     
     .container {
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 0 auto;
         padding: 20px;
+        position: relative;
+        z-index: 2;
     }
     
     h1 {
         text-align: center;
         color: #FFD700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        font-size: 2.5em;
-        margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 2px 2px 4px rgba(0,0,0,0.3);
+        font-size: 2.8em;
+        margin-bottom: 30px;
+        padding: 10px;
+        background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.05));
+        border-radius: 15px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
     }
 
+    .gift-counter {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+    
+    .counter-item {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px 30px;
+        min-width: 180px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        transition: transform 0.3s;
+    }
+    
+    .counter-icon {
+        font-size: 2.5em;
+    }
+    
+    .counter-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .counter-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+        color: #FFD700;
+    }
+    
+    .counter-value {
+        font-size: 2.2em;
+        font-weight: bold;
+        color: #FFD700;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    
+    .auth-controls {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .user-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px 30px;
+        border-radius: 30px;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+    
+    .username {
+        color: #FFD700;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .btn {
+        background: linear-gradient(45deg, #FF416C, #FF4B2B);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: bold;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+    }
+
+    .santa-btn {
+        background: linear-gradient(45deg, #00b09b, #96c93d);
+        padding: 18px 40px;
+        font-size: 1.2em;
+        box-shadow: 0 4px 20px rgba(0, 176, 155, 0.3);
+    }
+    
+    .btn-login {
+        background: linear-gradient(45deg, #8B5BF6, #6B46C1);
+    }
+    
+    .btn-register {
+        background: linear-gradient(45deg, #4F46E5, #3730A3);
+    }
+    
+    .btn-logout {
+        background: linear-gradient(45deg, #EF4444, #DC2626);
+        padding: 10px 25px;
+        font-size: 1em;
+    }
+    
+    .gifts-frame {
+        position: relative;
+        width: 100%;
+        height: 850px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        overflow: hidden;
+        border: 4px dashed rgba(255, 215, 0, 0.4);
+        margin: 40px 0;
+        padding: 20px;
+        box-shadow: inset 0 0 50px rgba(255, 215, 0, 0.1);
+    }
+    
+    .corner {
+        position: absolute;
+        font-size: 2em;
+        opacity: 0.6;
+    }
+    
+    #gifts-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .gift-box {
+        position: absolute;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        width: 180px;
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 15px;
+    }
+    
+    .gift-box.opened {
+        cursor: default;
+        opacity: 0.9;
+        background: rgba(255, 255, 255, 0.08);
+        border: 2px solid rgba(255, 215, 0, 0.5);
+    }
+    
+    .gift-box-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s;
+    }
+    
+    .opened-gift {
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .congratulation {
+        font-size: 0.95em;
+        margin-bottom: 15px;
+        color: #FFD700;
+        font-weight: bold;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 10px;
+        border-left: 4px solid #FFD700;
+    }
+    
+    .gift-inside {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 15px;
+        border: 3px solid #FFD700;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .lock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .lock-icon {
+        font-size: 2.5em;
+        color: #FFD700;
+    }
+    
+    .lock-text {
+        color: #FFD700;
+        font-weight: bold;
+        font-size: 0.9em;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    
     .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        backdrop-filter: blur(5px);
     }
 
     .modal.hidden {
@@ -127,176 +368,90 @@
     }
 
     .modal-content {
-        background: #ffffff;
-        color: #333;
-        padding: 25px;
-        border-radius: 12px;
-        max-width: 420px;
+        background: linear-gradient(135deg, #1e3799, #0c2461);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 500px;
         width: 90%;
         text-align: center;
         position: relative;
+        border: 3px solid rgba(255, 215, 0, 0.5);
+        box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
     }
-
-    .modal-content img {
-        max-width: 100%;
-        margin-top: 15px;
-        border-radius: 10px;
-    }
-
-    .modal-content p {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 10px;
-        right: 14px;
-        font-size: 24px;
-        cursor: pointer;
-    }
-
     
-    .stats {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 30px;
+    .modal-header {
         display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-    
-    .stat-item {
-        text-align: center;
-        background: rgba(255, 215, 0, 0.2);
-        padding: 15px 25px;
-        border-radius: 10px;
-        min-width: 150px;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-    }
-    
-    .stat-value {
-        font-size: 38px;
-        font-weight: bold;
-        color: #FFD700;
-    }
-    
-    .controls {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .auth-controls {
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    
-    .user-info, .auth-links {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 10px 20px;
-        border-radius: 25px;
-        backdrop-filter: blur(10px);
-    }
-    
-    .btn {
-        background: linear-gradient(45deg, #FF416C, #FF4B2B);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 25px;
-        cursor: pointer;
-        font-size: 1.1em;
-        margin: 5px;
-        transition: transform 0.3s, box-shadow 0.3s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    #santa-btn {
-        background: linear-gradient(45deg, #00b09b, #96c93d);
-    }
-    
-    .btn-login {
-        background: rgb(137, 95, 178);
-    }
-    
-    .btn-register {
-        background: rgb(103, 76, 131);
-    }
-    
-    .btn-logout {
-        background: rgb(137, 95, 178);
-        margin-left: 10px;
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-    
-    #gifts-container {
-        position: relative;
-        width: 100%;
-        height: 800px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
-        overflow: hidden;
-        border: 2px dashed rgba(12, 102, 43, 0.965);
-        margin: 20px 0;
-    }
-    
-    .gift-box {
-        position: absolute;
-        transition: transform 0.3s, filter 0.3s;
-        cursor: pointer;
-        width: 170px;
-        height: 170px;
-        display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(255, 215, 0, 0.3);
     }
     
-    .gift-box-image {
-        width: 100%;
-        height: 100%;
-
-    }
-    
-    .opened-gift {
-        text-align: center;
-        padding: 10px;
-    }
-    
-    .congratulation {
-        font-size: 0.9em;
-        margin-bottom: 10px;
+    .modal-header h3 {
+        margin: 0;
         color: #FFD700;
-        font-weight: bold;
+        font-size: 1.8em;
     }
     
-    .gift-inside {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #FFD700;
-    }
-    
-    .lock-icon {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        font-size: 20px;
+    .modal-close {
+        font-size: 28px;
+        cursor: pointer;
         color: #FFD700;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        transition: transform 0.3s;
     }
     
-    /* Анимация падающих снежинок */
-    @keyframes fall {
-        to {
-            transform: translateY(100vh) rotate(360deg);
+    .modal-gift-img {
+        max-width: 200px;
+        margin: 20px auto;
+        border-radius: 15px;
+        border: 3px solid #FFD700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+    
+    .modal-message {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #FFD700;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 4px solid #FFD700;
+        margin-top: 20px;
+    }
+    
+    .instructions strong {
+        color: #FFD700;
+    }
+    
+    @keyframes decoration-fall {
+        0% {
+            transform: translateY(-20px) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(calc(100vh + 50px)) rotate(360deg);
+            opacity: 0;
         }
     }
     
+    .new-year-decorations {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+
 </style>
 {% endblock %}

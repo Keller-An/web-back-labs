@@ -42,13 +42,14 @@ def generate_non_overlapping_positions():
     attempts = 0
     max_attempts = 1000
     
-    # Размеры коробки в процентах
-    box_width = 15
-    box_height = 20
+    # Увеличиваем размеры коробки (стало шире)
+    box_width = 18  # Было 15
+    box_height = 22  # Было 20
     
     while len(positions) < 10 and attempts < max_attempts:
-        top = random.randint(5, 85 - box_height)
-        left = random.randint(5, 85 - box_width)
+        # Делаем рамку пошире (меньше отступы от краев)
+        top = random.randint(3, 87 - box_height)  # Было 5, 85
+        left = random.randint(3, 87 - box_width)  # Было 5, 85
 
         overlap = False
         for (existing_top, existing_left) in positions:
@@ -64,8 +65,8 @@ def generate_non_overlapping_positions():
 
     # Если не удалось сгенерировать 10 непересекающихся позиций
     while len(positions) < 10:
-        top = random.randint(5, 85 - box_height)
-        left = random.randint(5, 85 - box_width)
+        top = random.randint(3, 87 - box_height)
+        left = random.randint(3, 87 - box_width)
         positions.append((top, left))
     
     return positions

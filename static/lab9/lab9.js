@@ -79,33 +79,47 @@ function resetGifts() {
         });
 }
 
-// Снежинки
-function createSnowflakes() {
-    const container = document.querySelector('.snowflakes');
+function createNewYearDecorations() {
+    const container = document.querySelector('.new-year-decorations');
     if (!container) return;
 
-    for (let i = 0; i < 20; i++) {
-        const s = document.createElement('div');
-        const size = Math.random()*10+5;
-        s.className = 'snowflake';
-        s.style.cssText = `
-            width:${size}px; height:${size}px;
-            left:${Math.random()*100}%; top:-10px;
-            background:white; border-radius:50%; position:absolute;
-            opacity:${Math.random()*0.5+0.3};
-            animation: fall ${Math.random()*10+10}s linear ${Math.random()*5}s infinite;
+    const decorations = ['🥂', '🎁', '🍪', '☃️', '🟣', '🎀', '⭐', '🎄', '❄️', '✨'];
+    
+    for (let i = 0; i < 25; i++) {
+        const dec = document.createElement('div');
+        const size = Math.random() * 20 + 15;
+        const symbol = decorations[Math.floor(Math.random() * decorations.length)];
+        
+        dec.className = 'new-year-decoration';
+        dec.textContent = symbol;
+        dec.style.cssText = `
+            font-size: ${size}px;
+            left: ${Math.random() * 100}%;
+            top: -20px;
+            position: absolute;
+            opacity: ${Math.random() * 0.5 + 0.3};
+            animation: decoration-fall ${Math.random() * 15 + 10}s linear ${Math.random() * 5}s infinite;
+            z-index: 1;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
         `;
-        container.appendChild(s);
+        container.appendChild(dec);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    createSnowflakes();
+    createNewYearDecorations();
 
     document.querySelectorAll('.gift-box:not(.opened)').forEach(box => {
         box.addEventListener('click', () => openGift(box.dataset.id));
-        box.addEventListener('mouseenter', () => box.style.transform = 'scale(1.1) rotate(5deg)');
-        box.addEventListener('mouseleave', () => box.style.transform = 'scale(1)');
+        box.addEventListener('mouseenter', () => {
+            box.style.transform = 'scale(1.15) rotate(8deg)';
+            box.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.7)';
+        });
+        box.addEventListener('mouseleave', () => {
+            box.style.transform = 'scale(1) rotate(0deg)';
+            box.style.boxShadow = 'none';
+        });
     });
 
     const santaBtn = document.getElementById('santa-btn');
